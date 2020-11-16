@@ -1,2 +1,2 @@
 # freud-compiler
-Programski prevodilac "Freud" ("Frojd"), napravljen u akademske svrhe projekta Programski prevodioci (FTN│RA│3. godina). 
+Programski prevodilac "Freud" ("Frojd"), akademski projekat predmeta Programski prevodioci (FTN│RA│3. godina).
