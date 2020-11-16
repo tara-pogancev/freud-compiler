@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_SYNTAX_TAB_H_INCLUDED
-# define YY_YY_SYNTAX_TAB_H_INCLUDED
+#ifndef YY_YY_SEMANTIC_TAB_H_INCLUDED
+# define YY_YY_SEMANTIC_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -49,33 +49,42 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    _TYPE_INT = 258,
-    _TYPE_UINT = 259,
-    _FUNCTION = 260,
-    _IF = 261,
-    _ELSE = 262,
-    _RETURN = 263,
-    _THEN = 264,
-    _LPAREN = 265,
-    _RPAREN = 266,
-    _LBRACKET = 267,
-    _RBRACKET = 268,
-    _SEMI = 269,
-    _ASSIGN = 270,
-    _COMMA = 271,
-    _POSTINC = 272,
-    _OP = 273,
-    _RELOP = 274,
-    _ID = 275,
-    _INT_NUM = 276,
-    _UINT_NUM = 277,
-    ONLY_IF = 278
+    _TYPE = 258,
+    _FUNCTION = 259,
+    _IF = 260,
+    _ELSE = 261,
+    _RETURN = 262,
+    _LPAREN = 263,
+    _RPAREN = 264,
+    _LBRACKET = 265,
+    _RBRACKET = 266,
+    _SEMI = 267,
+    _ASSIGN = 268,
+    _COMMA = 269,
+    _POSTINC = 270,
+    _OP = 271,
+    _RELOP = 272,
+    _ID = 273,
+    _INT_NUM = 274,
+    _UINT_NUM = 275,
+    ONLY_IF = 276
   };
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 22 "semantic.y"
+
+	int i;
+	char *s;
+	
+
+#line 85 "semantic.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -85,4 +94,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SYNTAX_TAB_H_INCLUDED  */
+#endif /* !YY_YY_SEMANTIC_TAB_H_INCLUDED  */
