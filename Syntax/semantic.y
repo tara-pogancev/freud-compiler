@@ -16,6 +16,8 @@
   int var_num = 0;
   int fun_idx = -1;
   int fcall_idx = -1;
+  
+  int type_temp = 0;
 
 %}
 
@@ -47,7 +49,7 @@
 %token <s> _INT_NUM
 %token <s> _UINT_NUM
 
-%type <i> num_exp exp literal function_call argument relation 
+%type <i> num_exp exp literal function_call argument relation postinc_var
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
@@ -100,14 +102,26 @@ variable_list	//deo gde se difinisu varijable
   | variable_list variable
   ;
   
-variable	//definicija jedne varijable	int a;
-  : _TYPE _ID _SEMI
+variable	//definicija jedne varijable	int a; ili vise istog tipa int a, b, c;
+  : _TYPE 
       {
-      	if(lookup_symbol($2, VAR|PAR) == NO_INDEX) 
-      		insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
-        else err("redefinition of '%s'", $2);
-      }
+      	type_temp = $1;
+      	//insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
+      } var_ids _SEMI
   ;	
+	
+var_ids	//korisceno iskljucivo za deklaraciju
+	: _ID
+		{
+			if(lookup_symbol($1, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $1);
+			insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
+		}
+	| var_ids _COMMA _ID
+		{
+			if(lookup_symbol($3, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $3);
+			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
+		}
+	;
 	
 statement_list	//Lista naredbi koja moze biti u bloku {...}, moze biti i prazna {}
 	: //empty
@@ -120,7 +134,7 @@ statement	//Jedan iskaz ili blok naredbi
 	| assign_statement				//dodela
 	| if_else_statement				//if-else
 	| return_statement				//return
-//	| postinc_statement				//a++;
+	| postinc_statement				//a++;
 //	| function_statement			//poziv funkcije kao void
 	;
 
@@ -147,7 +161,7 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 
 exp	//Sve sto moze biti clan aritmetickog izraza
 	: literal
-//	| postinc_var
+	//| postinc_var
 	| function_call
 	| _ID
 		{
@@ -213,22 +227,18 @@ return_statement
 		}
 	;
 
-
-
-/*
 postinc_statement
 	: postinc_var _SEMI
 	;
 
-
 postinc_var
 	: _ID _POSTINC
 		{
-      $$ = lookup_symbol($1, VAR|PAR);
-      if($$ == NO_INDEX) err("'%s' undeclared", $1);
+      int idx = lookup_symbol($1, VAR|PAR);
+			if (idx == NO_INDEX) err("invalid lvalue '%s'", $1);
     }
 	;
-*/
+
 
 
 /*
@@ -236,7 +246,7 @@ declare_statement
 	: _TYPE variable_list _SEMI
 	| _TYPE assign_statement
 	;
-	*/
+
 		
 
 /*

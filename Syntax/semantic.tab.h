@@ -75,7 +75,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "semantic.y"
+#line 24 "semantic.y"
 
 	int i;
 	char *s;
