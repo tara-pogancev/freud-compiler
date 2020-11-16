@@ -104,10 +104,8 @@ variable_list	//deo gde se difinisu varijable
   
 variable	//definicija jedne varijable	int a; ili vise istog tipa int a, b, c;
   : _TYPE 
-      {
-      	type_temp = $1;
-      	//insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
-      } var_ids _SEMI
+      { type_temp = $1; } 
+      var_ids _SEMI
   ;	
 	
 var_ids	//korisceno iskljucivo za deklaraciju
@@ -161,7 +159,7 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 
 exp	//Sve sto moze biti clan aritmetickog izraza
 	: literal
-	//| postinc_var
+	| postinc_var
 	| function_call
 	| _ID
 		{
@@ -236,18 +234,10 @@ postinc_var
 		{
       int idx = lookup_symbol($1, VAR|PAR);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", $1);
+			$$ = idx;
     }
 	;
-
-
-
-/*
-declare_statement
-	: _TYPE variable_list _SEMI
-	| _TYPE assign_statement
-	;
-
-		
+	
 
 /*
 function_statement

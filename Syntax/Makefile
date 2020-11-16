@@ -20,7 +20,7 @@ COMPILER_BUILD = lex.yy.c $(SRC).tab.c symtab.c $(CGENC)
 # fajlovi od kojih zavisi ponovno prevođenje
 COMPILER_DEPENDS = $(COMPILER_BUILD) defs.h symtab.h $(CGENH)
 # fajlovi koje treba pobrisati da bi ostao samo izvorni kod
-COMPILER_CLEAN = lex.yy.c $(SRC).tab.c $(SRC).tab.h $(SRC).output $(SRC) *.?~ *.mc~ .make.out* *.asm Makefile~
+COMPILER_CLEAN = lex.yy.c $(SRC).tab.c $(SRC).tab.h $(SRC).output $(SRC) *.?~ *.mew~ .make.out* *.asm Makefile~
 # ako treba sprovesti samo neke testove, ovu promenljivu treba postaviti na naziv testa
 TEST = ""
 
@@ -69,7 +69,7 @@ archive: clean
 	tar --exclude=*.gz -czf ../$$arc.tar.gz ../$$arc
 
 # testiranje kompajlera, izvršava se samo ako nema grešaka u gramatici
-# - u petlji će se kompajleru proslediti svi test*.mc fajlovi
+# - u petlji će se kompajleru proslediti svi test*.mew fajlovi
 # - ako u test fajlu postoji linija sa tekstom "//OPIS:", ispisaće se na ekranu
 # - ukoliko prilikom poziva kompajlera nije bilo grešaka, i ako postoji
 #   generisanje koda, ispisaće se i asemblerski izlaz
@@ -77,7 +77,7 @@ det: $(SRC)
 	@if [ ! -f $(SRC) ]; then exit 1; fi
 	@echo -e "\n\e[01;36mRunning compiler with test files...\e[00m"
 	@if [ "$$TEST" != "" ]; then all_tests=$$TEST; \
-	else all_tests=test*.mc; fi; \
+	else all_tests=test*.mew; fi; \
 	for test in $$all_tests; do \
 		if [[ $$test =~ .*synerr.* ]]; then echo -e "\e[01;35m"; ttyp="syn"; \
 		elif [[ $$test =~ .*semerr.* ]]; then echo -e "\e[01;34m"; ttyp="sem"; \
@@ -143,7 +143,7 @@ test: $(SRC)
 	@if [ ! -f $(SRC) ]; then exit 1; fi
 	@echo -e "\n\e[01;36mRunning compiler with test files...\e[00m\n"
 	@if [ "$$TEST" != "" ]; then all_tests=$$TEST; \
-	else all_tests=test*.mc; fi; \
+	else all_tests=test*.mew; fi; \
 	RESULTP="\e[01;32mPASSED\e[00m"; \
 	RESULTF="\e[01;31mFAILED\e[00m"; \
 	for test in $$all_tests; do \
@@ -211,8 +211,8 @@ help:
 	@echo -e "\n\e[01;36mPokretanje svih testova sa detaljnim ispisom\e[00m"
 	@echo -e "    \e[01;32mmake det\e[00m"
 	@echo -e "\n\e[01;36mPokretanje samo nekih testova\e[00m"
-	@echo -e "    \e[01;32mmake test TEST=test-ok1.mc\e[00m"
-	@echo -e "    \e[01;32mmake det TEST=\"test-ok1.mc test-ok2.mc\"\e[00m"
+	@echo -e "    \e[01;32mmake test TEST=test-ok1.mew\e[00m"
+	@echo -e "    \e[01;32mmake det TEST=\"test-ok1.mew test-ok2.mew\"\e[00m"
 	@echo -e "\n\e[01;36mNazivi test fajlova treba da slede sledeću konvenciju:\e[00m"
 	@echo -e "  \e[01;35mPočetak naziva  Značenje\e[00m"
 	@echo -e "    \e[01;36mtest-sanity\e[00m - korektan miniC program bez novih konstrukcija"
