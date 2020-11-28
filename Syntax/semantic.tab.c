@@ -89,9 +89,10 @@
   
   int type_temp = 0;
   int has_return = 0;
+  int sw_temp = -1;
 
 
-#line 95 "semantic.tab.c"
+#line 96 "semantic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -144,20 +145,29 @@ extern int yydebug;
     _IF = 260,
     _ELSE = 261,
     _RETURN = 262,
-    _LPAREN = 263,
-    _RPAREN = 264,
-    _LBRACKET = 265,
-    _RBRACKET = 266,
-    _SEMI = 267,
-    _ASSIGN = 268,
-    _COMMA = 269,
-    _POSTINC = 270,
-    _OP = 271,
-    _RELOP = 272,
-    _ID = 273,
-    _INT_NUM = 274,
-    _UINT_NUM = 275,
-    ONLY_IF = 276
+    _PARA = 263,
+    _LPAREN = 264,
+    _RPAREN = 265,
+    _LBRACKET = 266,
+    _RBRACKET = 267,
+    _SEMI = 268,
+    _ASSIGN = 269,
+    _COMMA = 270,
+    _POSTINC = 271,
+    _OP = 272,
+    _RELOP = 273,
+    _ID = 274,
+    _INT_NUM = 275,
+    _UINT_NUM = 276,
+    _SWITCH = 277,
+    _DEFAULT = 278,
+    _LSQBR = 279,
+    _RSQBR = 280,
+    _COLON = 281,
+    _CASE = 282,
+    _FINISH = 283,
+    ONLY_IF = 284,
+    NO_FINISH = 285
   };
 #endif
 
@@ -165,13 +175,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "semantic.y"
+#line 27 "semantic.y"
 
 	int i;
 	char *s;
 	
 
-#line 175 "semantic.tab.c"
+#line 185 "semantic.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -490,19 +500,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   72
+#define YYLAST   120
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  22
+#define YYNTOKENS  31
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  26
+#define YYNNTS  35
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  45
+#define YYNRULES  63
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  77
+#define YYNSTATES  122
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   276
+#define YYMAXUTOK   285
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -541,18 +551,21 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    62,    62,    69,    70,    75,    74,    92,    93,   102,
-     111,   118,   119,   124,   123,   131,   136,   144,   145,   149,
-     151,   152,   153,   154,   159,   163,   172,   173,   180,   181,
-     182,   183,   188,   193,   195,   201,   200,   216,   217,   226,
-     227,   233,   242,   249,   258,   262
+       0,    73,    73,    77,    81,    82,    87,    86,   104,   105,
+     114,   123,   130,   131,   136,   135,   143,   148,   154,   160,
+     169,   170,   174,   175,   176,   177,   178,   179,   180,   184,
+     188,   197,   198,   205,   206,   207,   208,   213,   218,   220,
+     226,   225,   241,   242,   249,   256,   257,   263,   272,   279,
+     288,   292,   302,   309,   301,   318,   317,   326,   327,   331,
+     332,   336,   343,   344
 };
 #endif
 
@@ -562,14 +575,17 @@ static const yytype_int16 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "_TYPE", "_FUNCTION", "_IF", "_ELSE",
-  "_RETURN", "_LPAREN", "_RPAREN", "_LBRACKET", "_RBRACKET", "_SEMI",
-  "_ASSIGN", "_COMMA", "_POSTINC", "_OP", "_RELOP", "_ID", "_INT_NUM",
-  "_UINT_NUM", "ONLY_IF", "$accept", "program", "function_list",
-  "function", "$@1", "parameter", "body", "variable_list", "variable",
-  "$@2", "var_ids", "statement_list", "statement", "compound_statement",
-  "assign_statement", "num_exp", "exp", "literal", "function_call", "$@3",
-  "argument", "if_else_statement", "relation", "return_statement",
-  "postinc_statement", "postinc_var", YY_NULLPTR
+  "_RETURN", "_PARA", "_LPAREN", "_RPAREN", "_LBRACKET", "_RBRACKET",
+  "_SEMI", "_ASSIGN", "_COMMA", "_POSTINC", "_OP", "_RELOP", "_ID",
+  "_INT_NUM", "_UINT_NUM", "_SWITCH", "_DEFAULT", "_LSQBR", "_RSQBR",
+  "_COLON", "_CASE", "_FINISH", "ONLY_IF", "NO_FINISH", "$accept",
+  "program", "function_list", "function", "$@1", "parameter", "body",
+  "variable_list", "variable", "$@2", "var_ids", "statement_list",
+  "statement", "compound_statement", "assign_statement", "num_exp", "exp",
+  "literal", "function_call", "$@3", "argument", "if_else_statement",
+  "relation", "return_statement", "postinc_statement", "postinc_var",
+  "para_statement", "$@4", "$@5", "switch_statement", "$@6", "switch_part",
+  "cases", "case", "case_part", YY_NULLPTR
 };
 #endif
 
@@ -580,16 +596,17 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285
 };
 # endif
 
-#define YYPACT_NINF (-59)
+#define YYPACT_NINF (-75)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-36)
+#define YYTABLE_NINF (-41)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -598,14 +615,19 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      21,    11,    36,    21,   -59,   -59,   -59,   -59,     3,    35,
-      39,    23,   -59,    29,    52,   -59,   -59,    40,    56,   -59,
-     -59,   -59,    -1,    42,    53,    22,   -59,   -59,    41,   -59,
-     -59,   -59,   -59,   -59,   -59,    50,   -59,     9,    27,    27,
-     -59,    -7,   -59,   -59,    32,   -59,   -59,   -59,   -59,     8,
-      27,   -59,   -59,   -59,    45,    34,    55,    -4,    57,   -59,
-      27,   -59,    37,   -59,    27,    15,   -59,    27,   -59,   -59,
-      51,    60,    51,    59,    15,   -59,   -59
+       0,    -5,     9,     0,   -75,   -75,   -75,   -75,    13,    26,
+      36,    10,   -75,    38,    34,   -75,   -75,    39,    58,   -75,
+     -75,   -75,    -1,    55,    57,    56,    75,   -75,   -75,    64,
+      61,   -75,   -75,   -75,   -75,   -75,   -75,    74,   -75,   -75,
+      76,    66,    31,    31,   -75,     3,   -75,   -75,    30,   -75,
+     -75,   -75,   -75,    86,    19,    31,   -75,    72,   -75,    31,
+     -75,    73,    53,    83,    -2,    85,   -75,    31,    77,   -75,
+      47,    70,    80,    87,    31,    37,   -75,    31,   -75,   -75,
+     -75,   -75,    31,    80,    93,    80,    18,    88,    89,    80,
+      37,   -75,    31,    31,    78,   -75,   -75,    80,    50,    62,
+     -10,   -75,    31,    81,   -75,    82,   -75,    90,    37,   -75,
+      37,    91,    84,    92,    95,    96,   -75,   103,   -75,   -75,
+      37,   -75
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -613,30 +635,37 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     3,     5,     1,     4,     0,     7,
-       0,     0,     8,     0,     0,    11,     6,     0,    17,     9,
-      13,    12,     0,     0,     0,     0,    17,    10,     0,    18,
-      19,    20,    21,    22,    23,     0,    15,     0,     0,     0,
-      43,    31,    33,    34,     0,    26,    28,    30,    29,     0,
-       0,    45,    44,    14,     0,     0,     0,     0,     0,    42,
-       0,    24,     0,    16,     0,     0,    32,    37,    27,    25,
-      41,    39,    38,     0,     0,    36,    40
+       3,     0,     0,     2,     4,     6,     1,     5,     0,     8,
+       0,     0,     9,     0,     0,    12,     7,     0,    20,    10,
+      14,    13,     0,     0,     0,     0,     0,    20,    11,     0,
+       0,    21,    22,    23,    24,    25,    26,     0,    27,    28,
+      16,     0,     0,     0,    49,    36,    38,    39,     0,    31,
+      33,    35,    34,     0,     0,     0,    51,     0,    50,     0,
+      15,     0,     0,     0,     0,     0,    48,     0,     0,    29,
+       0,     0,    19,    17,     0,     0,    37,    42,    32,    52,
+      30,    55,     0,    47,    45,    43,     0,     0,     0,    18,
+       0,    41,     0,     0,     0,    56,    46,    44,     0,     0,
+       0,    59,     0,     0,    57,     0,    60,     0,     0,    61,
+       0,     0,    62,     0,     0,     0,    58,     0,    63,    53,
+       0,    54
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -59,   -59,   -59,    66,   -59,   -59,   -59,   -59,   -59,   -59,
-     -59,    44,   -58,   -59,   -59,   -36,    12,   -59,   -59,   -59,
-     -59,   -59,   -59,   -59,   -59,   -22
+     -75,   -75,   -75,   111,   -75,   -75,   -75,   -75,   -75,   -75,
+     -75,    79,   -74,   -75,   -75,   -20,    48,    17,   -75,   -75,
+     -75,   -75,    15,   -75,   -75,   -22,   -75,   -75,   -75,   -75,
+     -75,   -75,   -75,    20,   -75
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
       -1,     2,     3,     4,     8,    11,    16,    18,    21,    23,
-      37,    22,    29,    30,    31,    44,    45,    46,    47,    58,
-      73,    32,    56,    33,    34,    48
+      41,    22,    31,    32,    33,    62,    49,    50,    51,    65,
+      86,    34,    63,    35,    36,    52,    38,    87,   120,    39,
+      88,    95,   100,   101,   109
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -644,60 +673,79 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      35,   -35,    55,    57,    24,    66,    25,    71,    51,    26,
-      27,     9,    60,    24,    62,    25,    76,    28,    26,    61,
-      24,    53,    25,    54,     1,    26,    28,    35,    70,     5,
-      39,    72,    13,    28,    40,    39,     6,    14,    10,    15,
-      41,    42,    43,    35,    59,    41,    42,    43,    60,    69,
-      60,    64,    35,    60,    50,    17,    51,    12,    19,    20,
-      36,    38,    52,    63,    65,    67,    74,    60,    75,     7,
-      49,     0,    68
+      37,    84,   104,     1,    24,    48,    25,    26,    76,     6,
+      27,    28,   -40,   105,     5,    67,    96,    99,    29,    56,
+      13,    30,     9,    64,    24,    14,    25,    26,    91,    10,
+      27,    69,    37,    92,   112,    70,   113,    17,    29,    72,
+      43,    30,    24,    66,    25,    26,   121,    67,    27,    15,
+      45,    46,    47,    37,    83,    12,    29,    85,    19,    30,
+      80,    20,    89,   102,    67,    43,    42,    67,    37,    44,
+      67,    74,    97,    98,    40,    45,    46,    47,    55,    60,
+      56,    61,    46,    47,    53,    57,    37,    58,    37,    68,
+      59,    71,    73,    75,    77,    81,    79,    67,    37,    90,
+      94,    82,    93,   111,   116,    99,    54,   108,   110,   118,
+     114,   117,   115,   119,     7,    78,   103,   107,     0,     0,
+     106
 };
 
 static const yytype_int8 yycheck[] =
 {
-      22,     8,    38,    39,     5,     9,     7,    65,    15,    10,
-      11,     8,    16,     5,    50,     7,    74,    18,    10,    11,
-       5,    12,     7,    14,     3,    10,    18,    49,    64,    18,
-       8,    67,     9,    18,    12,     8,     0,    14,     3,    10,
-      18,    19,    20,    65,    12,    18,    19,    20,    16,    12,
-      16,    17,    74,    16,    13,     3,    15,    18,    18,     3,
-      18,     8,    12,    18,     9,     8,     6,    16,     9,     3,
-      26,    -1,    60
+      22,    75,    12,     3,     5,    25,     7,     8,    10,     0,
+      11,    12,     9,    23,    19,    17,    90,    27,    19,    16,
+      10,    22,     9,    43,     5,    15,     7,     8,    10,     3,
+      11,    12,    54,    15,   108,    55,   110,     3,    19,    59,
+       9,    22,     5,    13,     7,     8,   120,    17,    11,    11,
+      19,    20,    21,    75,    74,    19,    19,    77,    19,    22,
+      13,     3,    82,    13,    17,     9,     9,    17,    90,    13,
+      17,    18,    92,    93,    19,    19,    20,    21,    14,    13,
+      16,    15,    20,    21,     9,    24,   108,    13,   110,     3,
+      14,    19,    19,    10,     9,    25,    19,    17,   120,     6,
+      11,    14,    14,    13,    12,    27,    27,    26,    26,    13,
+      19,    16,    28,    10,     3,    67,    99,   102,    -1,    -1,
+     100
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    23,    24,    25,    18,     0,    25,    26,     8,
-       3,    27,    18,     9,    14,    10,    28,     3,    29,    18,
-       3,    30,    33,    31,     5,     7,    10,    11,    18,    34,
-      35,    36,    43,    45,    46,    47,    18,    32,     8,     8,
-      12,    18,    19,    20,    37,    38,    39,    40,    47,    33,
-      13,    15,    12,    12,    14,    37,    44,    37,    41,    12,
-      16,    11,    37,    18,    17,     9,     9,     8,    38,    12,
-      37,    34,    37,    42,     6,     9,    34
+       0,     3,    32,    33,    34,    19,     0,    34,    35,     9,
+       3,    36,    19,    10,    15,    11,    37,     3,    38,    19,
+       3,    39,    42,    40,     5,     7,     8,    11,    12,    19,
+      22,    43,    44,    45,    52,    54,    55,    56,    57,    60,
+      19,    41,     9,     9,    13,    19,    20,    21,    46,    47,
+      48,    49,    56,     9,    42,    14,    16,    24,    13,    14,
+      13,    15,    46,    53,    46,    50,    13,    17,     3,    12,
+      46,    19,    46,    19,    18,    10,    10,     9,    47,    19,
+      13,    25,    14,    46,    43,    46,    51,    58,    61,    46,
+       6,    10,    15,    14,    11,    62,    43,    46,    46,    27,
+      63,    64,    13,    48,    12,    23,    64,    53,    26,    65,
+      26,    13,    43,    43,    19,    28,    12,    16,    13,    10,
+      59,    43
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    22,    23,    24,    24,    26,    25,    27,    27,    27,
-      28,    29,    29,    31,    30,    32,    32,    33,    33,    34,
-      34,    34,    34,    34,    35,    36,    37,    37,    38,    38,
-      38,    38,    38,    39,    39,    41,    40,    42,    42,    43,
-      43,    44,    45,    45,    46,    47
+       0,    31,    32,    32,    33,    33,    35,    34,    36,    36,
+      36,    37,    38,    38,    40,    39,    41,    41,    41,    41,
+      42,    42,    43,    43,    43,    43,    43,    43,    43,    44,
+      45,    46,    46,    47,    47,    47,    47,    47,    48,    48,
+      50,    49,    51,    51,    51,    52,    52,    53,    54,    54,
+      55,    56,    58,    59,    57,    61,    60,    62,    62,    63,
+      63,    64,    65,    65
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     0,     7,     0,     2,     4,
-       4,     0,     2,     0,     4,     1,     3,     0,     2,     1,
-       1,     1,     1,     1,     3,     4,     1,     3,     1,     1,
-       1,     1,     3,     1,     1,     0,     5,     0,     1,     5,
-       7,     3,     3,     2,     2,     2
+       0,     2,     1,     0,     1,     2,     0,     7,     0,     2,
+       4,     4,     0,     2,     0,     4,     1,     3,     5,     3,
+       0,     2,     1,     1,     1,     1,     1,     1,     1,     3,
+       4,     1,     3,     1,     1,     1,     1,     3,     1,     1,
+       0,     5,     0,     1,     3,     5,     7,     3,     3,     2,
+       2,     2,     0,     0,    15,     0,     6,     3,     6,     1,
+       2,     3,     2,     4
 };
 
 
@@ -1393,15 +1441,15 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 63 "semantic.y"
+#line 74 "semantic.y"
                 {
 			if (lookup_symbol("main", FUN) == NO_INDEX) err("undefined reference to 'main'");
 		}
-#line 1401 "semantic.tab.c"
+#line 1449 "semantic.tab.c"
     break;
 
-  case 5:
-#line 75 "semantic.y"
+  case 6:
+#line 87 "semantic.y"
                 {
 			fun_idx = lookup_symbol((yyvsp[0].s), FUN);
 			if (fun_idx == NO_INDEX) fun_idx = insert_symbol((yyvsp[0].s), FUN, (yyvsp[-1].i), NO_ATR, NO_ATR);
@@ -1409,203 +1457,268 @@ yyreduce:
 			
 			has_return = 0;
 		}
-#line 1413 "semantic.tab.c"
+#line 1461 "semantic.tab.c"
     break;
 
-  case 6:
-#line 83 "semantic.y"
+  case 7:
+#line 95 "semantic.y"
                 {
 			clear_symbols(fun_idx+1);
 			var_num = 0;
 			par_num = 0;
 		}
-#line 1423 "semantic.tab.c"
-    break;
-
-  case 7:
-#line 92 "semantic.y"
-                { set_atr1(fun_idx, 0); }
-#line 1429 "semantic.tab.c"
+#line 1471 "semantic.tab.c"
     break;
 
   case 8:
-#line 94 "semantic.y"
+#line 104 "semantic.y"
+                { set_atr1(fun_idx, 0); }
+#line 1477 "semantic.tab.c"
+    break;
+
+  case 9:
+#line 106 "semantic.y"
                 {
 			if ((yyvsp[-1].i) == VOID) err("invalid parameter type '%s'", (yyvsp[0].s));
     	insert_symbol((yyvsp[0].s), PAR, (yyvsp[-1].i), 1, NO_ATR);
       set_atr1(fun_idx, 1);
       set_atr2(fun_idx, (yyvsp[-1].i));
     }
-#line 1440 "semantic.tab.c"
+#line 1488 "semantic.tab.c"
     break;
 
-  case 9:
-#line 103 "semantic.y"
+  case 10:
+#line 115 "semantic.y"
   {
   	if(lookup_symbol((yyvsp[0].s), PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
 			insert_symbol((yyvsp[0].s), PAR, (yyvsp[-1].i), ++par_num, NO_ATR);
   }
-#line 1449 "semantic.tab.c"
+#line 1497 "semantic.tab.c"
     break;
 
-  case 10:
-#line 112 "semantic.y"
+  case 11:
+#line 124 "semantic.y"
                 {
 			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", get_name(fun_idx));
 		}
-#line 1457 "semantic.tab.c"
+#line 1505 "semantic.tab.c"
     break;
 
-  case 13:
-#line 124 "semantic.y"
+  case 14:
+#line 136 "semantic.y"
       { 
       if ((yyvsp[0].i) == VOID) err("invalid variable type");
       type_temp = (yyvsp[0].i); }
-#line 1465 "semantic.tab.c"
-    break;
-
-  case 15:
-#line 132 "semantic.y"
-                {
-			if(lookup_symbol((yyvsp[0].s), VAR|PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
-			insert_symbol((yyvsp[0].s), VAR, type_temp, ++var_num, NO_ATR);
-		}
-#line 1474 "semantic.tab.c"
+#line 1513 "semantic.tab.c"
     break;
 
   case 16:
-#line 137 "semantic.y"
+#line 144 "semantic.y"
                 {
 			if(lookup_symbol((yyvsp[0].s), VAR|PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
 			insert_symbol((yyvsp[0].s), VAR, type_temp, ++var_num, NO_ATR);
 		}
-#line 1483 "semantic.tab.c"
+#line 1522 "semantic.tab.c"
     break;
 
-  case 25:
-#line 164 "semantic.y"
+  case 17:
+#line 149 "semantic.y"
+                {
+			if(lookup_symbol((yyvsp[0].s), VAR|PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
+			insert_symbol((yyvsp[0].s), VAR, type_temp, ++var_num, NO_ATR);
+		}
+#line 1531 "semantic.tab.c"
+    break;
+
+  case 18:
+#line 155 "semantic.y"
+                {
+			if(lookup_symbol((yyvsp[-2].s), VAR|PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[-2].s));
+			insert_symbol((yyvsp[-2].s), VAR, type_temp, ++var_num, NO_ATR);
+			if(get_type((yyvsp[0].i)) != type_temp) err("incompatible types in assignment");
+		}
+#line 1541 "semantic.tab.c"
+    break;
+
+  case 19:
+#line 161 "semantic.y"
+                {
+			if(lookup_symbol((yyvsp[-2].s), VAR|PAR) != NO_INDEX) err("redefinition of '%s'", (yyvsp[-2].s));
+			insert_symbol((yyvsp[-2].s), VAR, type_temp, ++var_num, NO_ATR);
+			if(get_type((yyvsp[0].i)) != type_temp) err("incompatible types in assignment");
+		}
+#line 1551 "semantic.tab.c"
+    break;
+
+  case 30:
+#line 189 "semantic.y"
                 {
 			int idx = lookup_symbol((yyvsp[-3].s), VAR|PAR);
 			if (idx == NO_INDEX) err("invalid lvalue '%s' in assignment", (yyvsp[-3].s));
 			else if(get_type(idx) != get_type((yyvsp[-1].i))) err("incompatible types in assignment");
 		}
-#line 1493 "semantic.tab.c"
+#line 1561 "semantic.tab.c"
     break;
 
-  case 27:
-#line 174 "semantic.y"
+  case 32:
+#line 199 "semantic.y"
                 {
     	if(get_type((yyvsp[-2].i)) != get_type((yyvsp[0].i))) err("invalid operands: arithmetic operation");
     }
-#line 1501 "semantic.tab.c"
+#line 1569 "semantic.tab.c"
     break;
 
-  case 31:
-#line 184 "semantic.y"
+  case 36:
+#line 209 "semantic.y"
                 {
       (yyval.i) = lookup_symbol((yyvsp[0].s), VAR|PAR);
       if((yyval.i) == NO_INDEX) err("'%s' undeclared", (yyvsp[0].s));
     }
-#line 1510 "semantic.tab.c"
+#line 1578 "semantic.tab.c"
     break;
 
-  case 32:
-#line 189 "semantic.y"
+  case 37:
+#line 214 "semantic.y"
                 { (yyval.i) = (yyvsp[-1].i); }
-#line 1516 "semantic.tab.c"
+#line 1584 "semantic.tab.c"
     break;
 
-  case 33:
-#line 194 "semantic.y"
+  case 38:
+#line 219 "semantic.y"
                 { (yyval.i) = insert_literal((yyvsp[0].s), INT);	}
-#line 1522 "semantic.tab.c"
+#line 1590 "semantic.tab.c"
     break;
 
-  case 34:
-#line 196 "semantic.y"
+  case 39:
+#line 221 "semantic.y"
                 {	(yyval.i) = insert_literal((yyvsp[0].s), UINT); }
-#line 1528 "semantic.tab.c"
+#line 1596 "semantic.tab.c"
     break;
 
-  case 35:
-#line 201 "semantic.y"
+  case 40:
+#line 226 "semantic.y"
                 {
     	fcall_idx = lookup_symbol((yyvsp[0].s), FUN);
       if(fcall_idx == NO_INDEX) err("'%s' is not a function", (yyvsp[0].s));
     }
-#line 1537 "semantic.tab.c"
+#line 1605 "semantic.tab.c"
     break;
 
-  case 36:
-#line 206 "semantic.y"
+  case 41:
+#line 231 "semantic.y"
     {
     	if(get_atr1(fcall_idx) != (yyvsp[-1].i)) 
     		err("wrong number of args to function '%s'", get_name(fcall_idx));
     	set_type(FUN_REG, get_type(fcall_idx));
       (yyval.i) = FUN_REG;
     }
-#line 1548 "semantic.tab.c"
+#line 1616 "semantic.tab.c"
     break;
 
-  case 37:
-#line 216 "semantic.y"
+  case 42:
+#line 241 "semantic.y"
                 { (yyval.i) = 0; }
-#line 1554 "semantic.tab.c"
+#line 1622 "semantic.tab.c"
     break;
 
-  case 38:
-#line 218 "semantic.y"
+  case 43:
+#line 243 "semantic.y"
                 {
 			if (get_atr2(fcall_idx) != get_type((yyvsp[0].i)))
 				err("incompatible type for argument in '%s'", get_name(fcall_idx));
 			(yyval.i) = 1;
 		}
-#line 1564 "semantic.tab.c"
+#line 1632 "semantic.tab.c"
     break;
 
-  case 41:
-#line 234 "semantic.y"
+  case 44:
+#line 250 "semantic.y"
+                {
+			
+		}
+#line 1640 "semantic.tab.c"
+    break;
+
+  case 47:
+#line 264 "semantic.y"
                 {
 			if (get_type((yyvsp[-2].i)) != get_type((yyvsp[0].i))) 
 				err("invalid operands: relational operator");			
 					
 		}
-#line 1574 "semantic.tab.c"
+#line 1650 "semantic.tab.c"
     break;
 
-  case 42:
-#line 243 "semantic.y"
+  case 48:
+#line 273 "semantic.y"
                 {
 			has_return++;
 		
 			if (get_type(fun_idx) == VOID) err("return statement found in void function");
 			else if (get_type(fun_idx) != get_type((yyvsp[-1].i))) err("incompatible types in return");
 		}
-#line 1585 "semantic.tab.c"
+#line 1661 "semantic.tab.c"
     break;
 
-  case 43:
-#line 250 "semantic.y"
+  case 49:
+#line 280 "semantic.y"
                 {
 			has_return++;
 		
 			if (get_type(fun_idx) != VOID) warn("missing return statement");
 		}
-#line 1595 "semantic.tab.c"
+#line 1671 "semantic.tab.c"
     break;
 
-  case 45:
-#line 263 "semantic.y"
+  case 51:
+#line 293 "semantic.y"
                 {
       int idx = lookup_symbol((yyvsp[-1].s), VAR|PAR);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", (yyvsp[-1].s));
 			(yyval.i) = idx;
     }
-#line 1605 "semantic.tab.c"
+#line 1681 "semantic.tab.c"
+    break;
+
+  case 52:
+#line 302 "semantic.y"
+                {
+			int para_idx = lookup_symbol((yyvsp[0].s), VAR|PAR);
+			if(para_idx != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
+			else if ((yyvsp[-1].i) == VOID) err("invalid variable type in para");
+			else insert_symbol((yyvsp[0].s), VAR, (yyvsp[-1].i), ++var_num, NO_ATR);
+		}
+#line 1692 "semantic.tab.c"
+    break;
+
+  case 53:
+#line 309 "semantic.y"
+                {
+			if (get_type((yyvsp[-6].i)) != (yyvsp[-10].i)) err("assignment types not matching");
+			if (lookup_symbol((yyvsp[-9].s), VAR) != lookup_symbol((yyvsp[-2].s), VAR)) err("para numerators not matching");
+		}
+#line 1701 "semantic.tab.c"
+    break;
+
+  case 55:
+#line 318 "semantic.y"
+                {
+			sw_temp = lookup_symbol((yyvsp[-1].s), VAR|PAR);
+			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", (yyvsp[-1].s));
+		}
+#line 1710 "semantic.tab.c"
+    break;
+
+  case 61:
+#line 337 "semantic.y"
+                {
+			if (get_type((yyvsp[-1].i)) != get_type(sw_temp)) err("invalid literal type in switch");
+		}
+#line 1718 "semantic.tab.c"
     break;
 
 
-#line 1609 "semantic.tab.c"
+#line 1722 "semantic.tab.c"
 
       default: break;
     }
@@ -1837,7 +1950,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 277 "semantic.y"
+#line 348 "semantic.y"
 
 
 int yyerror(char *s) {

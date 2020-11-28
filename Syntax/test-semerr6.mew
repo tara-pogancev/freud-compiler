@@ -1,9 +1,0 @@
-//OPIS: Deklarisanje void promenljive
-int main() {
-    int a,b,c;
-    int d,e,f;
-    unsigned g,h,e;
-    int q,w;
-    void k;
-}
-

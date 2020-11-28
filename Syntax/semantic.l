@@ -18,11 +18,20 @@
 "else"						{ return _ELSE; }
 "return"					{ return _RETURN; }		
 
+"para"						{ return _PARA; }
+"switch"					{ return _SWITCH; }
+"case"						{ return _CASE; }
+"default"					{ return _DEFAULT; }
+"finish"					{ return _FINISH; }
+
 "("								{ return _LPAREN; }
 ")"								{ return _RPAREN; }
 "{"								{ return _LBRACKET; }
 "}"								{ return _RBRACKET; }
+"["								{ return _LSQBR; }
+"]"								{ return _RSQBR; }
 ";"								{ return _SEMI; }
+":"								{ return _COLON; }
 "="								{ return _ASSIGN; }
 ","								{ return _COMMA; }
 "++"							{ return _POSTINC; }

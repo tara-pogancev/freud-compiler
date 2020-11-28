@@ -31,6 +31,12 @@ int main() {
     unsigned w;
     unsigned uu;
     unsigned ww;
+    
+    int zbir = 0;
+		int razlika = 0;
+    
+    int d1, a1 = 10;
+    unsigned b1 = 10u;
 
     //poziv funkcije
     a = f(3);
@@ -75,5 +81,16 @@ int main() {
     a++;	//8
     
     b = 7 + a++;	//9
+
+		
+		para (int i = 0; i<10; i++){		//10
+			zbir = zbir + i;
+			razlika = razlika - i;
+		}    	
+		
+		para (int v = 1; v < 3; v++)		//11
+			razlika = zbir - v;
+			
+    
 }
 

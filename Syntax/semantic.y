@@ -20,6 +20,7 @@
   
   int type_temp = 0;
   int has_return = 0;
+  int sw_temp = -1;
 
 %}
 
@@ -34,6 +35,7 @@
 %token _IF
 %token _ELSE
 %token _RETURN
+%token _PARA
 
 %token _LPAREN
 %token _RPAREN
@@ -51,10 +53,19 @@
 %token <s> _INT_NUM
 %token <s> _UINT_NUM
 
+%token _SWITCH
+%token _DEFAULT
+%token _LSQBR
+%token _RSQBR
+%token _COLON
+%token _CASE
+%token _FINISH
+
 %type <i> num_exp exp literal function_call argument relation postinc_var
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
+%nonassoc NO_FINISH
 
 %%
 
@@ -63,6 +74,7 @@ program
 		{
 			if (lookup_symbol("main", FUN) == NO_INDEX) err("undefined reference to 'main'");
 		}
+	| //empty
 	;
 
 function_list
@@ -138,6 +150,19 @@ var_ids	//korisceno iskljucivo za deklaraciju
 			if(lookup_symbol($3, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $3);
 			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
 		}
+		//Individualni zadatak 1: int a, b = 100;
+	| var_ids	_COMMA _ID _ASSIGN num_exp
+		{
+			if(lookup_symbol($3, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $3);
+			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
+			if(get_type($5) != type_temp) err("incompatible types in assignment");
+		}
+	| _ID _ASSIGN num_exp
+		{
+			if(lookup_symbol($1, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $1);
+			insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
+			if(get_type($3) != type_temp) err("incompatible types in assignment");
+		}
 	;
 	
 statement_list	//Lista naredbi koja moze biti u bloku {...}, moze biti i prazna {}
@@ -146,13 +171,13 @@ statement_list	//Lista naredbi koja moze biti u bloku {...}, moze biti i prazna 
 	;
 
 statement	//Jedan iskaz ili blok naredbi
-	: compound_statement										//{...} blok naredbi
-//	| declare_statement 			//naredba deklaracije
+	: compound_statement			//{...} blok naredbi
 	| assign_statement				//dodela
 	| if_else_statement				//if-else
 	| return_statement				//return
 	| postinc_statement				//a++;
-//	| function_statement			//poziv funkcije kao void
+	| para_statement					//para(...)		
+	| switch_statement				//switch-case
 	;
 
 compound_statement
@@ -220,6 +245,11 @@ argument
 				err("incompatible type for argument in '%s'", get_name(fcall_idx));
 			$$ = 1;
 		}
+	// Za vise argumenata
+	| argument _COMMA num_exp
+		{
+			
+		}
 	;	
 	
 if_else_statement
@@ -267,13 +297,54 @@ postinc_var
     }
 	;
 	
-
-/*
-function_statement
-	: function_call _SEMI
+para_statement	//Individualni 2: para
+	: _PARA _LPAREN _TYPE _ID
+		{
+			int para_idx = lookup_symbol($4, VAR|PAR);
+			if(para_idx != NO_INDEX) err("redefinition of '%s'", $4);
+			else if ($3 == VOID) err("invalid variable type in para");
+			else insert_symbol($4, VAR, $3, ++var_num, NO_ATR);
+		}
+		 _ASSIGN num_exp _SEMI relation _SEMI _ID _POSTINC _RPAREN 
+		{
+			if (get_type($7) != $3) err("assignment types not matching");
+			if (lookup_symbol($4, VAR) != lookup_symbol($11, VAR)) err("para numerators not matching");
+		}
+		statement
 	;
-*/
-
+	
+switch_statement	//Individualni 3: switch case
+	: _SWITCH _LSQBR _ID _RSQBR
+		{
+			sw_temp = lookup_symbol($3, VAR|PAR);
+			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", $3);
+		}  
+		switch_part
+	;	
+	
+switch_part	//deo posle inicijalizacije switch-a	
+	:	_LBRACKET cases _RBRACKET	//no default
+	|	_LBRACKET cases _DEFAULT _COLON statement _RBRACKET	//default
+	;
+	
+cases
+	: case
+	| cases case
+	;
+	
+case
+	:	_CASE literal case_part
+		{
+			if (get_type($2) != get_type(sw_temp)) err("invalid literal type in switch");
+		}
+	;
+	
+case_part
+	:	_COLON statement %prec NO_FINISH
+	| _COLON statement _FINISH _SEMI
+	;
+	
+	
 %%
 
 int yyerror(char *s) {

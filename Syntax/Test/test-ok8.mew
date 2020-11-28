@@ -1,0 +1,16 @@
+//OPIS: Individualni zadatak 2 - PARA
+int main() {
+		int zbir = 0;
+		int razlika = 0;
+		
+		para (int i = 0; i<10; i++){
+			zbir = zbir + i;
+			razlika = razlika - i;
+		}    	
+		
+		para (int v = 1; v < 3; v++)
+			razlika = zbir - v;
+		
+    return 0;
+}
+
