@@ -7,10 +7,11 @@
 
 %%
 
-[ \t\n]+ 					    { /* skip */ }
+[ \t\n]+ 					{ /* skip */ }
 
-"int"									{ yylval.i = INT; 	return _TYPE; }
+"int"							{ yylval.i = INT; 	return _TYPE; }
 "unsigned"				{ yylval.i = UINT;	return _TYPE; }
+"void"						{ yylval.i = VOID;	return _TYPE; }
 
 "function"				{ return _FUNCTION; }	
 "if"							{ return _IF; }

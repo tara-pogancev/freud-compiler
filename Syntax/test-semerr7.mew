@@ -1,0 +1,13 @@
+//OPIS: Void funkcija - greska
+void fun(){
+	return 5;
+}
+
+int main() {
+    int a,b,c;
+    int d,e,f;
+    unsigned g,h,e;
+    int q,w;
+    void k;
+}
+

@@ -1,0 +1,12 @@
+//OPIS: funkcija vise parametara
+
+void fun(int a, unsigned b){
+		a = 4;
+		b = 5u;
+}
+
+int main() {
+    int a,b;
+    int c,d,e,f;
+    unsigned g;
+}

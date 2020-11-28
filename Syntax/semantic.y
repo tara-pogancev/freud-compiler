@@ -14,10 +14,12 @@
   int error_count = 0;
   int warning_count = 0;
   int var_num = 0;
+  int par_num = 0;
   int fun_idx = -1;
   int fcall_idx = -1;
   
   int type_temp = 0;
+  int has_return = 0;
 
 %}
 
@@ -74,11 +76,14 @@ function
 			fun_idx = lookup_symbol($2, FUN);
 			if (fun_idx == NO_INDEX) fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
 			else err("redefinition of function '%s'", $2);
+			
+			has_return = 0;
 		}
 		_LPAREN parameter _RPAREN body
 		{
 			clear_symbols(fun_idx+1);
 			var_num = 0;
+			par_num = 0;
 		}
 	;
 	
@@ -87,24 +92,38 @@ parameter		//Jedan parametar po funkciji
 		{ set_atr1(fun_idx, 0); }
 	| _TYPE _ID
 		{
+			if ($1 == VOID) err("invalid parameter type '%s'", $2);
     	insert_symbol($2, PAR, $1, 1, NO_ATR);
       set_atr1(fun_idx, 1);
       set_atr2(fun_idx, $1);
     }
+    
+   //Za vise parametara funkcije 
+  | parameter _COMMA  _TYPE _ID
+  {
+  	if(lookup_symbol($4, PAR) != NO_INDEX) err("redefinition of '%s'", $4);
+			insert_symbol($4, PAR, $3, ++par_num, NO_ATR);
+  }
+    
 	;
 
 body
 	: _LBRACKET variable_list statement_list _RBRACKET
+		{
+			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", get_name(fun_idx));
+		}
 	;
 	
-variable_list	//deo gde se difinisu varijable
+variable_list	//deo gde se definisu varijable
   : // empty
   | variable_list variable
   ;
   
 variable	//definicija jedne varijable	int a; ili vise istog tipa int a, b, c;
   : _TYPE 
-      { type_temp = $1; } 
+      { 
+      if ($1 == VOID) err("invalid variable type");
+      type_temp = $1; } 
       var_ids _SEMI
   ;	
 	
@@ -214,14 +233,24 @@ relation
 	: num_exp _RELOP num_exp
 		{
 			if (get_type($1) != get_type($3)) 
-				err("invalid operands: relational operator");				
+				err("invalid operands: relational operator");			
+					
 		}
 	;	
 	
 return_statement
 	: _RETURN num_exp _SEMI
 		{
-			if (get_type(fun_idx) != get_type($2)) err("incompatible types in return");
+			has_return++;
+		
+			if (get_type(fun_idx) == VOID) err("return statement found in void function");
+			else if (get_type(fun_idx) != get_type($2)) err("incompatible types in return");
+		}
+	| _RETURN _SEMI
+		{
+			has_return++;
+		
+			if (get_type(fun_idx) != VOID) warn("missing return statement");
 		}
 	;
 
