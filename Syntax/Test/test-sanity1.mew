@@ -20,6 +20,10 @@ void f3(int a, unsigned b){
 		return;
 }
 
+int f4(int a, int b){
+	return 0;
+}
+
 int main() {
     int a;
     int b;
@@ -91,6 +95,8 @@ int main() {
 		para (int v = 1; v < 3; v++)		//11
 			razlika = zbir - v;
 			
+    f3(4, 3u);		//12
     
+    a = f4(4, 5);	//13
 }
 

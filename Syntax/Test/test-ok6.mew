@@ -5,8 +5,17 @@ void fun(int a, unsigned b){
 		b = 5u;
 }
 
+int fun2(int a){
+	return 0;
+}
+
 int main() {
     int a,b;
     int c,d,e,f;
     unsigned g;
+    
+    fun(4, g);
+    c = fun2(e) + 78;
+    
+    return 0;
 }

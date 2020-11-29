@@ -9,5 +9,9 @@ int main() {
     unsigned g,h,e;
     int q,w;
     void k;
+    
+    fun(c);
+    
+    return 0;
 }
 

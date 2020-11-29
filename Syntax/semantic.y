@@ -4,6 +4,7 @@
   #include "defs.h"
   #include "symtab.h"
 
+
   int yyparse(void);
   int yylex(void);
   int yyerror(char *s);
@@ -21,6 +22,10 @@
   int type_temp = 0;
   int has_return = 0;
   int sw_temp = -1;
+  
+  int arg_num = 0;
+  int par_err = 0;
+  
 
 %}
 
@@ -88,33 +93,37 @@ function
 			fun_idx = lookup_symbol($2, FUN);
 			if (fun_idx == NO_INDEX) fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
 			else err("redefinition of function '%s'", $2);
-			
+			par_num = 0;
 			has_return = 0;
 		}
-		_LPAREN parameter _RPAREN body
+		_LPAREN parameters _RPAREN 
+		{
+			set_atr1(fun_idx, par_num);
+			var_num = 0;
+		}
+		body
 		{
 			clear_symbols(fun_idx+1);
 			var_num = 0;
-			par_num = 0;
 		}
 	;
 	
-parameter		//Jedan parametar po funkciji
+parameters		//Jedan parametar po funkciji
 	: //empty
 		{ set_atr1(fun_idx, 0); }
 	| _TYPE _ID
 		{
 			if ($1 == VOID) err("invalid parameter type '%s'", $2);
-    	insert_symbol($2, PAR, $1, 1, NO_ATR);
-      set_atr1(fun_idx, 1);
-      set_atr2(fun_idx, $1);
+    	insert_symbol($2, PAR, $1, ++par_num, NO_ATR);
+    	set_param_type(fun_idx, par_num, $1);
     }
     
    //Za vise parametara funkcije 
-  | parameter _COMMA  _TYPE _ID
+  | parameters _COMMA  _TYPE _ID
   {
   	if(lookup_symbol($4, PAR) != NO_INDEX) err("redefinition of '%s'", $4);
 			insert_symbol($4, PAR, $3, ++par_num, NO_ATR);
+			set_param_type(fun_idx, par_num, $3);
   }
     
 	;
@@ -122,7 +131,7 @@ parameter		//Jedan parametar po funkciji
 body
 	: _LBRACKET variable_list statement_list _RBRACKET
 		{
-			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", get_name(fun_idx));
+			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", 				get_name(fun_idx));
 		}
 	;
 	
@@ -178,6 +187,7 @@ statement	//Jedan iskaz ili blok naredbi
 	| postinc_statement				//a++;
 	| para_statement					//para(...)		
 	| switch_statement				//switch-case
+	| void_function_call			//void functions
 	;
 
 compound_statement
@@ -205,6 +215,11 @@ exp	//Sve sto moze biti clan aritmetickog izraza
 	: literal
 	| postinc_var
 	| function_call
+		{
+			//Ne sme biti void
+			int idx = fcall_idx;
+			if (get_type(idx) == VOID) err("using void function '%s' in expression", get_name(idx));
+		}
 	| _ID
 		{
       $$ = lookup_symbol($1, VAR|PAR);
@@ -212,7 +227,7 @@ exp	//Sve sto moze biti clan aritmetickog izraza
     }
 	| _LPAREN num_exp _RPAREN
 		{ $$ = $2; }
-	;
+	;	
 	
 literal
 	: _INT_NUM
@@ -226,11 +241,17 @@ function_call
 		{
     	fcall_idx = lookup_symbol($1, FUN);
       if(fcall_idx == NO_INDEX) err("'%s' is not a function", $1);
+      par_err = 0;
     } 
      _LPAREN argument _RPAREN
     {
+    
+    //U slucaju pogresnog broja parametara ne ispisuju se greske u tipovima
     	if(get_atr1(fcall_idx) != $4) 
-    		err("wrong number of args to function '%s'", get_name(fcall_idx));
+    		err("wrong number of arguments in function call '%s'", get_name(fcall_idx));
+    	else if (par_err != 0) 
+				err("incompatible type for argument in '%s'", get_name(fcall_idx));
+    		
     	set_type(FUN_REG, get_type(fcall_idx));
       $$ = FUN_REG;
     }
@@ -238,17 +259,30 @@ function_call
 	
 argument
 	: // empty
-		{ $$ = 0; }
+		{ $$ = 0; 
+			arg_num = 0;}
 	| num_exp
-		{
-			if (get_atr2(fcall_idx) != get_type($1))
-				err("incompatible type for argument in '%s'", get_name(fcall_idx));
+		{	
+			arg_num = 1;
 			$$ = 1;
+			if (get_param_type(fcall_idx, arg_num) != get_type($1)) par_err++;
 		}
 	// Za vise argumenata
 	| argument _COMMA num_exp
 		{
-			
+			arg_num++;
+			$$ = arg_num;
+		//	warn("%d and %d", get_type($3), get_param_type(fcall_idx, arg_num));
+			if (get_type($3) != get_param_type(fcall_idx, arg_num))	par_err++;
+		}
+	;	
+	
+void_function_call
+	: function_call _SEMI
+		{
+			//Mora biti void
+			int idx = fcall_idx;
+			if (get_type(idx) != VOID) err("incorrect call of non-void function '%s'", get_name(idx));
 		}
 	;	
 	
@@ -333,10 +367,11 @@ cases
 	;
 	
 case
-	:	_CASE literal case_part
+	:	_CASE literal 
 		{
 			if (get_type($2) != get_type(sw_temp)) err("invalid literal type in switch");
 		}
+		case_part
 	;
 	
 case_part

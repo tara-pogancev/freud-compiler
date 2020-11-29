@@ -2,13 +2,16 @@
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
+#define PARAM_NUMBER 5
+
 // Element tabele simbola
 typedef struct sym_entry {
    char *   name;          // ime simbola
    unsigned kind;          // vrsta simbola
    unsigned type;          // tip vrednosti simbola
-   unsigned atr1;          // dodatni attribut simbola
-   unsigned atr2;          // dodatni attribut simbola
+   unsigned atr1;          // dodatni attributi simbola
+   unsigned atr2;  				
+   unsigned *param_types;	//tipovi parametara
 } SYMBOL_ENTRY;
 
 // Vraca indeks prvog sledeceg praznog elementa.
@@ -53,5 +56,14 @@ unsigned logarithm2(unsigned value);
 
 // Inicijalizacija tabele simbola.
 void init_symtab(void);
+
+//Preuzeto iz pymicka za funkcije vise promenljivih
+void     set_param_type(int index, unsigned number, unsigned type);
+unsigned get_param_type(int index, unsigned number);
+
+
+
+
+
 
 #endif

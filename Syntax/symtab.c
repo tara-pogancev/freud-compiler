@@ -194,3 +194,29 @@ void init_symtab(void) {
   }
 }
 
+//PYMICKO PROMENE
+void set_param_type(int index, unsigned number, unsigned type) {
+    if(index > -1 && index < SYMBOL_TABLE_LENGTH) {
+        if(symbol_table[index].param_types == 0) {
+            symbol_table[index].param_types = 
+                malloc(sizeof(unsigned) * PARAM_NUMBER);
+            int i;
+            for(i = 0; i < PARAM_NUMBER; i++)
+                symbol_table[index].param_types[i] = NO_TYPE;
+        }
+        if(number > 0 && number <= PARAM_NUMBER)
+            symbol_table[index].param_types[number - 1] = type;
+    }
+}
+
+unsigned get_param_type(int index, unsigned number) {
+    if(index > -1 && index < SYMBOL_TABLE_LENGTH)
+        if(symbol_table[index].param_types && number > 0 
+           && number <= PARAM_NUMBER)
+            return symbol_table[index].param_types[number - 1];
+    return NO_TYPE;
+}
+
+
+
+

@@ -10,7 +10,7 @@ int main() {
     		{
     			b = 3;
     		}
-    	case 7 :
+    	case 7u :
     		{
     			b = 7;
     		}	
