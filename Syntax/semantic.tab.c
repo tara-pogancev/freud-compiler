@@ -569,8 +569,8 @@ static const yytype_int16 yyrline[] =
      169,   178,   179,   183,   184,   185,   186,   187,   188,   189,
      190,   194,   198,   207,   208,   215,   216,   217,   223,   228,
      233,   235,   241,   240,   262,   264,   271,   281,   290,   291,
-     297,   306,   313,   322,   326,   336,   343,   335,   352,   351,
-     360,   361,   365,   366,   371,   370,   378,   379
+     296,   305,   312,   321,   325,   335,   342,   334,   351,   350,
+     359,   360,   364,   365,   370,   369,   377,   378
 };
 #endif
 
@@ -1683,7 +1683,7 @@ yyreduce:
     break;
 
   case 50:
-#line 298 "semantic.y"
+#line 297 "semantic.y"
                 {
 			if (get_type((yyvsp[-2].i)) != get_type((yyvsp[0].i))) 
 				err("invalid operands: relational operator");			
@@ -1693,7 +1693,7 @@ yyreduce:
     break;
 
   case 51:
-#line 307 "semantic.y"
+#line 306 "semantic.y"
                 {
 			has_return++;
 		
@@ -1704,7 +1704,7 @@ yyreduce:
     break;
 
   case 52:
-#line 314 "semantic.y"
+#line 313 "semantic.y"
                 {
 			has_return++;
 		
@@ -1714,7 +1714,7 @@ yyreduce:
     break;
 
   case 54:
-#line 327 "semantic.y"
+#line 326 "semantic.y"
                 {
       int idx = lookup_symbol((yyvsp[-1].s), VAR|PAR);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", (yyvsp[-1].s));
@@ -1724,7 +1724,7 @@ yyreduce:
     break;
 
   case 55:
-#line 336 "semantic.y"
+#line 335 "semantic.y"
                 {
 			int para_idx = lookup_symbol((yyvsp[0].s), VAR|PAR);
 			if(para_idx != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
@@ -1735,7 +1735,7 @@ yyreduce:
     break;
 
   case 56:
-#line 343 "semantic.y"
+#line 342 "semantic.y"
                 {
 			if (get_type((yyvsp[-6].i)) != (yyvsp[-10].i)) err("assignment types not matching");
 			if (lookup_symbol((yyvsp[-9].s), VAR) != lookup_symbol((yyvsp[-2].s), VAR)) err("para numerators not matching");
@@ -1744,7 +1744,7 @@ yyreduce:
     break;
 
   case 58:
-#line 352 "semantic.y"
+#line 351 "semantic.y"
                 {
 			sw_temp = lookup_symbol((yyvsp[-1].s), VAR|PAR);
 			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", (yyvsp[-1].s));
@@ -1753,7 +1753,7 @@ yyreduce:
     break;
 
   case 64:
-#line 371 "semantic.y"
+#line 370 "semantic.y"
                 {
 			if (get_type((yyvsp[0].i)) != get_type(sw_temp)) err("invalid literal type in switch");
 		}
@@ -1993,7 +1993,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 383 "semantic.y"
+#line 382 "semantic.y"
 
 
 int yyerror(char *s) {

@@ -25,7 +25,11 @@ int f4(int a, int b){
 }
 
 int main() {
-    int a;
+
+		/* Tara
+				Pogancev */
+
+    int a;    
     int b;
     int aa;
     int bb;
@@ -98,5 +102,18 @@ int main() {
     f3(4, 3u);		//12
     
     a = f4(4, 5);	//13
+    
+    switch [a] {			//14
+    	case 1: b = 3;
+     
+     	case 2: {b = 3; b = 4;}
+     	
+     	case 3: b = 3; finish;
+     
+     	case 4: {b = 3; b = 4;} finish;
+     	
+     	default: b = 5;
+    
+    }
 }
 

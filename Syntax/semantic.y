@@ -290,7 +290,6 @@ if_else_statement
 	: _IF _LPAREN relation _RPAREN statement %prec ONLY_IF
 	| _IF _LPAREN relation _RPAREN statement _ELSE statement	
 		//Nije omoguceno vise od 1 elsa u ifu, ali moze if bez elsa
-		//Jedna akcija po ifu
 	;	
 	
 relation
