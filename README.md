@@ -1,8 +1,6 @@
 # Freud Compiler
 #### Autor: Tara Pogančev
 
-<img src="/src/freud.png">
-
 Programski prevodilac "Freud" (Frojd) akademski je projekat na Fakultetu tehničkih nauka (smer Računarstvo i automatika), predmeta programski prevodioci. 
 
 ## O kompajleru
