@@ -10,6 +10,9 @@ int main() {
     		{
     			b = 3;
     		}
+    	    	default:
+    		a = a - 1;	
+    		
     	case 7:
     		{
     			b = 7;

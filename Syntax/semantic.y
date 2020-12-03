@@ -26,6 +26,7 @@
   int arg_num = 0;
   int par_err = 0;
   
+  int case_int = 0;
 
 %}
 
@@ -131,7 +132,7 @@ parameters		//Jedan parametar po funkciji
 body
 	: _LBRACKET variable_list statement_list _RBRACKET
 		{
-			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", 				get_name(fun_idx));
+			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", 															get_name(fun_idx));
 		}
 	;
 	
@@ -351,6 +352,7 @@ switch_statement	//Individualni 3: switch case
 		{
 			sw_temp = lookup_symbol($3, VAR|PAR);
 			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", $3);
+			case_int++;		//Brojac trenutnog switch-a po redu
 		}  
 		switch_part
 	;	
@@ -369,6 +371,8 @@ case
 	:	_CASE literal 
 		{
 			if (get_type($2) != get_type(sw_temp)) err("invalid literal type in switch");
+				else if (get_atr1($2) == case_int) err("literal values must be unique");
+					else set_atr1($2, case_int);
 		}
 		case_part
 	;

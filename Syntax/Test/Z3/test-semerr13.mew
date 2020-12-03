@@ -16,12 +16,26 @@ int main() {
     		}	
 		 		finish;
 		 		
+		 	case 7 :
+    		{
+    			b = 7;
+    		}	
+		 		finish;	
+		 	case 1 :
+    		{
+    			b = 7;
+    		}	
+		 		finish;		
+		 		
     	default :
     		a = a - 1;
     }
     
     switch [b] {
-    	case 1 :
+    	case 77 :
+    		a = a + 5;
+    		
+    	case 77 :
     		a = a + 5;
     }
     

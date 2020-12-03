@@ -55,7 +55,7 @@ int insert_literal(char *str, unsigned type) {
   if(((type==INT) && (num<INT_MIN || num>INT_MAX) )
     || ((type==UINT) && (num<0 || num>UINT_MAX)) )  
       err("literal out of range");
-  idx = insert_symbol(str, LIT, type, NO_ATR, NO_ATR);
+  idx = insert_symbol(str, LIT, type, 0, NO_ATR);
   return idx;
 }
 
