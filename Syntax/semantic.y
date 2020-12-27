@@ -112,22 +112,25 @@ function
 parameters		//Jedan parametar po funkciji
 	: //empty
 		{ set_atr1(fun_idx, 0); }
-	| _TYPE _ID
+	| parameter
+	;
+
+parameter
+	: _TYPE _ID
 		{
 			if ($1 == VOID) err("invalid parameter type '%s'", $2);
     	insert_symbol($2, PAR, $1, ++par_num, NO_ATR);
     	set_param_type(fun_idx, par_num, $1);
-    }
-    
-   //Za vise parametara funkcije 
-  | parameters _COMMA  _TYPE _ID
+    } 
+     //Za vise parametara funkcije 
+  | parameter _COMMA  _TYPE _ID
   {
   	if(lookup_symbol($4, PAR) != NO_INDEX) err("redefinition of '%s'", $4);
 			insert_symbol($4, PAR, $3, ++par_num, NO_ATR);
 			set_param_type(fun_idx, par_num, $3);
-  }
-    
+  } 
 	;
+
 
 body
 	: _LBRACKET variable_list statement_list _RBRACKET

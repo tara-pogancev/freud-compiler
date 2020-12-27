@@ -2,7 +2,7 @@
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
-#define PARAM_NUMBER 5
+#define PARAM_NUMBER 50
 
 // Element tabele simbola
 typedef struct sym_entry {
