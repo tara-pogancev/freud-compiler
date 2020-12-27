@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_SEMANTIC_TAB_H_INCLUDED
-# define YY_YY_SEMANTIC_TAB_H_INCLUDED
+#ifndef YY_YY_FREUD_TAB_H_INCLUDED
+# define YY_YY_FREUD_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -84,13 +84,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 33 "semantic.y"
+#line 37 "freud.y"
 
 	int i;
 	char *s;
 	
 
-#line 94 "semantic.tab.h"
+#line 94 "freud.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -103,4 +103,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SEMANTIC_TAB_H_INCLUDED  */
+#endif /* !YY_YY_FREUD_TAB_H_INCLUDED  */
