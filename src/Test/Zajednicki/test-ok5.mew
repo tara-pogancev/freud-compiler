@@ -4,7 +4,8 @@ unsigned fun(){
 	return 5u;
 }
 
-unsigned fun2(){
+unsigned fun2(){	
+	return 0u;
 }
 
 

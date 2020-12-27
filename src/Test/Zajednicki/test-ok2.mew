@@ -4,4 +4,5 @@ int main() {
     a = 2u;
     b = 3u;
     c = 4u;
+    return 0;
 }

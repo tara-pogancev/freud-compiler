@@ -150,7 +150,7 @@ parameter
 body
 	: _LBRACKET variable_list statement_list _RBRACKET
 		{
-			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", 															get_name(fun_idx));
+			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", get_name(fun_idx));
 			
 			if(var_num)
 				code("\n\t\tSUBS\t%%15, $%d, %%15", 4*var_num);
