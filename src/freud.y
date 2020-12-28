@@ -80,12 +80,27 @@
 %%
 
 program
-	: function_list
+	: global_vars function_list
 		{
 			if (lookup_symbol("main", FUN) == NO_INDEX) 
 				err("undefined reference to 'main'");
 		}
 	| //empty
+	;
+
+global_vars
+	: //empty
+	| global_vars global_var
+	;
+
+global_var
+	: _TYPE _ID _SEMI 
+		{
+			if ($1 == VOID) err("invalid variable type '%s'", $2);
+			if (lookup_symbol($2, GL) != NO_INDEX) err("redefinition of '%s'", $2);
+			insert_symbol($2, GL, $1, NO_ATR, NO_ATR);
+			code("\n%s:\n\t\tWORD\t1", $2);
+		}
 	;
 
 function_list
@@ -102,7 +117,7 @@ function
 			par_num = 0;
 			has_return = 0;
 			
-			code("\n%s", $2);
+			code("\n%s:", $2);
 			code("\n\t\tPUSH\t%%14");
 			code("\n\t\tMOV \t%%15,%%14");
 						
@@ -112,15 +127,17 @@ function
 			set_atr1(fun_idx, par_num);
 			var_num = 0;
 			
-			code("\n@%s_exit:", $2);
-			code("\n\t\tMOV \t%%14, %%15");
-			code("\n\t\tRET");
-			
 		}
 		body
 		{
 			clear_symbols(fun_idx+1);
 			var_num = 0;
+			
+						
+			code("\n@%s_exit:", $2);
+			code("\n\t\tMOV \t%%14, %%15");
+			code("\n\t\tPOP \t%%14");
+			code("\n\t\tRET");
 		}
 	;
 	
@@ -148,15 +165,25 @@ parameter
 
 
 body
-	: _LBRACKET variable_list statement_list _RBRACKET
+	: _LBRACKET variable_list 
 		{
-			if (has_return == 0 && get_type(fun_idx)!=VOID) warn("no return statement in %s", get_name(fun_idx));
-			
+
 			if(var_num)
-				code("\n\t\tSUBS\t%%15, $%d, %%15", 4*var_num);
+				code("\n\t\tSUBS\t%%15,$%d,%%15", 4*var_num);
 			code("\n@%s_body:", get_name(fun_idx));
 			
 		}
+		
+		statement_list _RBRACKET
+		
+		{
+			//ZBOG TEST FAJLOVA MAIN BEZ RETUN-A PROLAZI BEZ WARNINGA!
+			if (has_return == 0 && get_type(fun_idx)!=VOID) 
+				if (lookup_symbol("main", FUN)!=fun_idx)
+				warn("no return statement in %s", get_name(fun_idx));
+			
+		}
+		
 	;
 	
 variable_list	//deo gde se definisu varijable
@@ -175,26 +202,28 @@ variable	//definicija jedne varijable	int a; ili vise istog tipa int a, b, c;
 var_ids	//korisceno iskljucivo za deklaraciju
 	: _ID
 		{
-			if(lookup_symbol($1, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $1);
+			if(lookup_symbol($1, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $1);
 			insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
 		}
 	| var_ids _COMMA _ID
 		{
-			if(lookup_symbol($3, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $3);
+			if(lookup_symbol($3, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $3);
 			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
 		}
 		//Individualni zadatak 1: int a, b = 100;
 	| var_ids	_COMMA _ID _ASSIGN num_exp
 		{
-			if(lookup_symbol($3, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $3);
+			if(lookup_symbol($3, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $3);
 			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
 			if(get_type($5) != type_temp) err("incompatible types in assignment");
+			//TODO: GENERISANJE KODA
 		}
 	| _ID _ASSIGN num_exp
 		{
-			if(lookup_symbol($1, VAR|PAR) != NO_INDEX) err("redefinition of '%s'", $1);
-			insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
+			if(lookup_symbol($1, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $1);
+			int idx = insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
 			if(get_type($3) != type_temp) err("incompatible types in assignment");
+			gen_mov($3, idx);
 		}
 	;
 	
@@ -221,9 +250,11 @@ compound_statement
 assign_statement
 	: _ID _ASSIGN num_exp _SEMI
 		{
-			int idx = lookup_symbol($1, VAR|PAR);
-			if (idx == NO_INDEX) err("invalid lvalue '%s' in assignment", $1);
+			int idx = lookup_symbol($1, VAR|PAR|GL);
+			if (idx == NO_INDEX) err("invalid value '%s' in assignment", $1);
 			else if(get_type(idx) != get_type($3)) err("incompatible types in assignment");
+						
+			gen_mov($3, idx);
 		}
 	;
 	
@@ -256,10 +287,12 @@ exp	//Sve sto moze biti clan aritmetickog izraza
 			//Ne sme biti void
 			int idx = fcall_idx;
 			if (get_type(idx) == VOID) err("using void function '%s' in expression", get_name(idx));
+			$$ = take_reg();
+			gen_mov(FUN_REG, $$);
 		}
 	| _ID
 		{
-      $$ = lookup_symbol($1, VAR|PAR);
+      $$ = lookup_symbol($1, VAR|PAR|GL);
       if($$ == NO_INDEX) err("'%s' undeclared", $1);
     }
 	| _LPAREN num_exp _RPAREN
@@ -402,7 +435,7 @@ postinc_statement
 postinc_var
 	: _ID _POSTINC
 		{
-      int idx = lookup_symbol($1, VAR|PAR);
+      int idx = lookup_symbol($1, VAR|PAR|GL);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", $1);
 			$$ = idx;
     }
@@ -411,7 +444,7 @@ postinc_var
 para_statement	//Individualni 2: para
 	: _PARA _LPAREN _TYPE _ID
 		{
-			int para_idx = lookup_symbol($4, VAR|PAR);
+			int para_idx = lookup_symbol($4, VAR|PAR|GL);
 			if(para_idx != NO_INDEX) err("redefinition of '%s'", $4);
 			else if ($3 == VOID) err("invalid variable type in para");
 			else insert_symbol($4, VAR, $3, ++var_num, NO_ATR);
@@ -427,7 +460,7 @@ para_statement	//Individualni 2: para
 switch_statement	//Individualni 3: switch case
 	: _SWITCH _LSQBR _ID _RSQBR
 		{
-			sw_temp = lookup_symbol($3, VAR|PAR);
+			sw_temp = lookup_symbol($3, VAR|PAR|GL);
 			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", $3);
 			case_int++;		//Brojac trenutnog switch-a po redu
 		}  

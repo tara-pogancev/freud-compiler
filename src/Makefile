@@ -20,7 +20,7 @@ COMPILER_BUILD = lex.yy.c $(SRC).tab.c symtab.c $(CGENC)
 # fajlovi od kojih zavisi ponovno prevođenje
 COMPILER_DEPENDS = $(COMPILER_BUILD) defs.h symtab.h $(CGENH)
 # fajlovi koje treba pobrisati da bi ostao samo izvorni kod
-COMPILER_CLEAN = lex.yy.c $(SRC).tab.c $(SRC).tab.h $(SRC).output $(SRC) *.?~ *.mew~ .make.out* *.asm Makefile~ *.txt~
+COMPILER_CLEAN = lex.yy.c $(SRC).tab.c $(SRC).tab.h $(SRC).output $(SRC) *.?~ *.mew~ .make.out* *.asm Makefile~ *.txt~ hipsim~
 # ako treba sprovesti samo neke testove, ovu promenljivu treba postaviti na naziv testa
 TEST = ""
 
