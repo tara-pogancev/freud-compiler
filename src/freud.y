@@ -31,6 +31,12 @@
   int par_err = 0;
   
   int case_int = 0;
+  
+  int declare_vars[10];
+  int declare_vars_num = 0;
+  int is_postinc = 0;
+  int postinc_stm = 0;
+  int last_was_inc = 0;
 
 %}
 
@@ -71,11 +77,12 @@
 %token _CASE
 %token _FINISH
 
-%type <i> num_exp exp literal function_call argument relation postinc_var if_part
+%type <i> num_exp exp literal function_call argument relation postinc_var if_part postinc_statement
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
 %nonassoc NO_FINISH
+%nonassoc ONLY_EXP
 
 %%
 
@@ -97,9 +104,10 @@ global_var
 	: _TYPE _ID _SEMI 
 		{
 			if ($1 == VOID) err("invalid variable type '%s'", $2);
-			if (lookup_symbol($2, GL) != NO_INDEX) err("redefinition of '%s'", $2);
+			if (lookup_symbol($2, GL) != -1) err("redefinition of '%s'", $2);
 			insert_symbol($2, GL, $1, NO_ATR, NO_ATR);
 			code("\n%s:\n\t\tWORD\t1", $2);
+
 		}
 	;
 
@@ -195,36 +203,42 @@ variable	//definicija jedne varijable	int a; ili vise istog tipa int a, b, c;
   : _TYPE 
       { 
       if ($1 == VOID) err("invalid variable type");
-      type_temp = $1; } 
-      var_ids _SEMI
+      type_temp = $1; 
+      declare_vars_num = 0;
+      
+      printf("%d",type_temp);
+      } 
+      declare_vars _SEMI
   ;	
 	
 var_ids	//korisceno iskljucivo za deklaraciju
 	: _ID
 		{
 			if(lookup_symbol($1, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $1);
-			insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
+			int idx = insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
+			
+			declare_vars[declare_vars_num] = idx;
 		}
 	| var_ids _COMMA _ID
 		{
 			if(lookup_symbol($3, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $3);
-			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
+			int idx = insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
+			
+			declare_vars_num++;
+			declare_vars[declare_vars_num] = idx;
 		}
+		
+declare_vars
 		//Individualni zadatak 1: int a, b = 100;
-	| var_ids	_COMMA _ID _ASSIGN num_exp
+	: var_ids _ASSIGN num_exp
 		{
-			if(lookup_symbol($3, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $3);
-			insert_symbol($3, VAR, type_temp, ++var_num, NO_ATR);
-			if(get_type($5) != type_temp) err("incompatible types in assignment");
-			//TODO: GENERISANJE KODA
-		}
-	| _ID _ASSIGN num_exp
-		{
-			if(lookup_symbol($1, VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", $1);
-			int idx = insert_symbol($1, VAR, type_temp, ++var_num, NO_ATR);
 			if(get_type($3) != type_temp) err("incompatible types in assignment");
-			gen_mov($3, idx);
+
+			for (int i = 0; i<declare_vars_num; i++)
+				gen_mov($3, declare_vars[i]);
+			
 		}
+	| var_ids	//Bez dodele vrednosti
 	;
 	
 statement_list	//Lista naredbi koja moze biti u bloku {...}, moze biti i prazna {}
@@ -255,26 +269,115 @@ assign_statement
 			else if(get_type(idx) != get_type($3)) err("incompatible types in assignment");
 						
 			gen_mov($3, idx);
+
 		}
 	;
 	
 num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 	: exp
+		{
+			if(is_postinc) {
+				  	
+				last_was_inc++;  	  	
+ 		   	postinc_stm = take_reg();
+ 		   	gen_mov($1, postinc_stm);
+ 		    set_type(postinc_stm, get_type($1)); 		    
+ 		    $$ = postinc_stm;
+			
+				int idx = lookup_symbol(get_name($1), GL);
+				if (idx != NO_INDEX) {
+					//Globalna prom
+					if (get_type(idx)==INT)
+						code("\n\t\tADDS\t");
+					else code("\n\t\tADDU\t");
+					code("%s,$1,%s", get_name(idx), get_name(idx));
+				}	
+			else {
+			
+				idx = lookup_symbol(get_name($1), VAR|PAR);
+			
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+			
+				free_if_reg($1);
+				$1 = take_reg();
+			
+				gen_sym_name(idx);
+				code(",$1,");
+				gen_sym_name(idx);
+				set_type($1, get_type(idx));
+			}
+  	  	is_postinc = 0;
+    	} else last_was_inc = 0;
+		}		
 	| num_exp _OP exp
 		{
     	if(get_type($1) != get_type($3)) err("invalid operands: arithmetic operation");
-    	
     	int t1 = get_type($1);
+    	
     	code("\n\t\t%s\t", ar_instructions[$2 + (t1-1) * AROP_NUMBER]);
-    	gen_sym_name($1);
-    	code(",");
-    	gen_sym_name($3);
-    	code(",");
-    	free_if_reg($3);
-    	free_if_reg($1);
-    	$$ = take_reg();
-    	gen_sym_name($$);
-    	set_type($$, t1);
+    	
+    	 if (last_was_inc) {
+  	    	  
+  	  	gen_sym_name(postinc_stm);
+  	  	code(",");
+  	  	gen_sym_name($3);
+  	  	code(",");
+  	  	free_if_reg($3);
+  	  	free_if_reg(postinc_stm);
+  	  	free_if_reg($$);
+ 	  	 	$$ = take_reg();
+  	  	gen_sym_name($$);
+  	  	set_type($$, t1);
+
+		   	postinc_stm = 0;
+  	  	last_was_inc = 0;
+  	  } else {
+
+   		 	gen_sym_name($1);
+  	  	code(",");
+  	  	gen_sym_name($3);
+  	  	code(",");
+  	  	free_if_reg($3);
+  	  	free_if_reg($1);
+ 	  	 	$$ = take_reg();
+  	  	gen_sym_name($$);
+  	  	set_type($$, t1);
+  	  	
+  	  }
+    	
+ 	  	if (is_postinc){
+    		
+			int idx = lookup_symbol(get_name($3), GL);
+				if (idx != NO_INDEX) {
+					//Globalna prom
+					if (get_type(idx)==INT)
+						code("\n\t\tADDS\t");
+					else code("\n\t\tADDU\t");
+					code("%s,$1,%s", get_name(idx), get_name(idx));
+				}	
+			else {
+			
+				idx = lookup_symbol(get_name($3), VAR|PAR);
+			
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+			
+				free_if_reg($3);
+				$3 = take_reg();
+			
+				gen_sym_name(idx);
+				code(",$1,");
+				gen_sym_name(idx);
+				set_type($3, get_type(idx));
+			}
+    		
+    		is_postinc = 0;
+    	}
+    	
+    	last_was_inc = 0;
     	
     }
 	;
@@ -282,6 +385,10 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 exp	//Sve sto moze biti clan aritmetickog izraza
 	: literal
 	| postinc_var
+		{
+			is_postinc++;
+			$$ = $1;
+		}
 	| function_call
 		{
 			//Ne sme biti void
@@ -369,11 +476,11 @@ void_function_call
 if_else_statement
 	: if_part %prec ONLY_IF
 		{
-			code("\n@exit%d", $1);
+			code("\n@exit%d:", $1);
 		}
 	| if_part _ELSE statement	
 		{
-			code("\n@exit%d", $1);
+			code("\n@exit%d:", $1);
 		}
 	//Nije omoguceno vise od 1 elsa u ifu, ali moze if bez elsa
 	;	
@@ -382,7 +489,7 @@ if_part
 	: _IF _LPAREN
 		{
 			$<i>$ = ++lab_num;
-			code("\n@if%d", lab_num);
+			code("\n@if%d:", lab_num);
 		}	
 		relation
 		{
@@ -402,10 +509,10 @@ relation
 		{
 			if (get_type($1) != get_type($3)) 
 				err("invalid operands: relational operator");			
-				
+
 			$$ = $2 + ((get_type($1)-1)*RELOP_NUMBER);
 			gen_cmp($1, $3);	
-					
+			
 		}
 	;	
 	
@@ -430,6 +537,35 @@ return_statement
 
 postinc_statement
 	: postinc_var _SEMI
+		{
+			int idx = lookup_symbol(get_name($1), GL);
+			if (idx != NO_INDEX) {
+				//Globalna prom
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+				code("%s,$1,%s", get_name(idx), get_name(idx));
+			}	
+			else {
+			
+				idx = lookup_symbol(get_name($1), VAR|PAR);
+			
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+			
+				free_if_reg($1);
+				$$ = take_reg();
+			
+				gen_sym_name(idx);
+				code(",$1,");
+				gen_sym_name(idx);
+				set_type($$, get_type(idx));
+			}
+			
+			is_postinc = 0;
+		
+		}
 	;
 
 postinc_var
@@ -438,6 +574,8 @@ postinc_var
       int idx = lookup_symbol($1, VAR|PAR|GL);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", $1);
 			$$ = idx;
+			idx = take_reg();
+
     }
 	;
 	
