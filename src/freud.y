@@ -37,6 +37,7 @@
   int is_postinc = 0;
   int postinc_stm = 0;
   int last_was_inc = 0;
+  int args_for_stack[10];
 
 %}
 
@@ -140,8 +141,7 @@ function
 		{
 			clear_symbols(fun_idx+1);
 			var_num = 0;
-			
-						
+									
 			code("\n@%s_exit:", $2);
 			code("\n\t\tMOV \t%%14, %%15");
 			code("\n\t\tPOP \t%%14");
@@ -178,7 +178,8 @@ body
 
 			if(var_num)
 				code("\n\t\tSUBS\t%%15,$%d,%%15", 4*var_num);
-			code("\n@%s_body:", get_name(fun_idx));
+				
+				code("\n@%s_body:", get_name(fun_idx));
 			
 		}
 		
@@ -227,6 +228,7 @@ var_ids	//korisceno iskljucivo za deklaraciju
 			declare_vars_num++;
 			declare_vars[declare_vars_num] = idx;
 		}
+	;
 		
 declare_vars
 		//Individualni zadatak 1: int a, b = 100;
@@ -234,7 +236,7 @@ declare_vars
 		{
 			if(get_type($3) != type_temp) err("incompatible types in assignment");
 
-			for (int i = 0; i<declare_vars_num; i++)
+			for (int i = 0; i<=declare_vars_num; i++)
 				gen_mov($3, declare_vars[i]);
 			
 		}
@@ -326,7 +328,6 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
   	  	code(",");
   	  	free_if_reg($3);
   	  	free_if_reg(postinc_stm);
-  	  	free_if_reg($$);
  	  	 	$$ = take_reg();
   	  	gen_sym_name($$);
   	  	set_type($$, t1);
@@ -428,7 +429,16 @@ function_call
     		err("wrong number of arguments in function call '%s'", get_name(fcall_idx));
     	else if (par_err != 0) 
 				err("incompatible type for argument in '%s'", get_name(fcall_idx));
-    		
+    	
+    	//Generisanje koda:	
+    	
+    		//Stack
+    	for (int i = arg_num; i>0; i--) {
+    		free_if_reg(args_for_stack[i]);
+				code("\n\t\t\tPUSH\t");
+				gen_sym_name(args_for_stack[i]);
+			}
+    	
     	code("\n\t\t\tCALL\t%s", get_name(fcall_idx));	
     						
 			if (get_atr1(fcall_idx) > 0)
@@ -449,9 +459,8 @@ argument
 			$$ = 1;
 			if (get_param_type(fcall_idx, arg_num) != get_type($1)) par_err++;
 			
-			free_if_reg($1);
-			code("\n\t\t\tPUSH\t");
-			gen_sym_name($1);
+			//Gen
+			args_for_stack[arg_num] = $1;
 					
 		}
 	// Za vise argumenata
@@ -459,8 +468,11 @@ argument
 		{
 			arg_num++;
 			$$ = arg_num;
-		//	warn("%d and %d", get_type($3), get_param_type(fcall_idx, arg_num));
 			if (get_type($3) != get_param_type(fcall_idx, arg_num))	par_err++;
+			
+			
+			//Gen
+			args_for_stack[arg_num] = $3;
 		}
 	;	
 	

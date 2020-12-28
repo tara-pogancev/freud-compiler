@@ -1,5 +1,8 @@
 //OPIS: Sanity check za miniC gramatiku
 
+int global;
+unsigned global_u;
+
 int f(int x) {
     int y;
     return x + 2 - y;
@@ -45,6 +48,10 @@ int main() {
     
     int d1, a1 = 10;
     unsigned b1 = 10u;
+
+		//globalne promenljive
+		global = 10;
+		global_u = 10u;
 
     //poziv funkcije
     a = f(3);

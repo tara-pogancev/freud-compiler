@@ -106,9 +106,10 @@
   int is_postinc = 0;
   int postinc_stm = 0;
   int last_was_inc = 0;
+  int args_for_stack[10];
 
 
-#line 112 "freud.tab.c"
+#line 113 "freud.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -192,13 +193,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 43 "freud.y"
+#line 44 "freud.y"
 
 	int i;
 	char *s;
 	
 
-#line 202 "freud.tab.c"
+#line 203 "freud.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -576,14 +577,14 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    90,    90,    95,    99,   100,   104,   115,   116,   121,
-     134,   120,   154,   155,   159,   166,   177,   176,   198,   199,
-     204,   203,   215,   222,   233,   241,   245,   246,   250,   251,
-     252,   253,   254,   255,   256,   257,   261,   265,   277,   314,
-     386,   387,   392,   400,   405,   410,   412,   418,   417,   444,
-     446,   458,   468,   477,   481,   490,   495,   489,   508,   520,
-     530,   539,   572,   584,   591,   583,   600,   599,   609,   610,
-     614,   615,   620,   619,   629,   630
+       0,    91,    91,    96,   100,   101,   105,   116,   117,   122,
+     135,   121,   154,   155,   159,   166,   177,   176,   199,   200,
+     205,   204,   216,   223,   235,   243,   247,   248,   252,   253,
+     254,   255,   256,   257,   258,   259,   263,   267,   279,   316,
+     387,   388,   393,   401,   406,   411,   413,   419,   418,   454,
+     456,   467,   480,   489,   493,   502,   507,   501,   520,   532,
+     542,   551,   584,   596,   603,   595,   612,   611,   621,   622,
+     626,   627,   632,   631,   641,   642
 };
 #endif
 
@@ -1472,16 +1473,16 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 91 "freud.y"
+#line 92 "freud.y"
                 {
 			if (lookup_symbol("main", FUN) == NO_INDEX) 
 				err("undefined reference to 'main'");
 		}
-#line 1481 "freud.tab.c"
+#line 1482 "freud.tab.c"
     break;
 
   case 6:
-#line 105 "freud.y"
+#line 106 "freud.y"
                 {
 			if ((yyvsp[-2].i) == VOID) err("invalid variable type '%s'", (yyvsp[-1].s));
 			if (lookup_symbol((yyvsp[-1].s), GL) != -1) err("redefinition of '%s'", (yyvsp[-1].s));
@@ -1489,11 +1490,11 @@ yyreduce:
 			code("\n%s:\n\t\tWORD\t1", (yyvsp[-1].s));
 
 		}
-#line 1493 "freud.tab.c"
+#line 1494 "freud.tab.c"
     break;
 
   case 9:
-#line 121 "freud.y"
+#line 122 "freud.y"
                 {
 			fun_idx = lookup_symbol((yyvsp[0].s), FUN);
 			if (fun_idx == NO_INDEX) fun_idx = insert_symbol((yyvsp[0].s), FUN, (yyvsp[-1].i), NO_ATR, NO_ATR);
@@ -1506,26 +1507,25 @@ yyreduce:
 			code("\n\t\tMOV \t%%15,%%14");
 						
 		}
-#line 1510 "freud.tab.c"
+#line 1511 "freud.tab.c"
     break;
 
   case 10:
-#line 134 "freud.y"
+#line 135 "freud.y"
                 {
 			set_atr1(fun_idx, par_num);
 			var_num = 0;
 			
 		}
-#line 1520 "freud.tab.c"
+#line 1521 "freud.tab.c"
     break;
 
   case 11:
-#line 140 "freud.y"
+#line 141 "freud.y"
                 {
 			clear_symbols(fun_idx+1);
 			var_num = 0;
-			
-						
+									
 			code("\n@%s_exit:", (yyvsp[-6].s));
 			code("\n\t\tMOV \t%%14, %%15");
 			code("\n\t\tPOP \t%%14");
@@ -1566,14 +1566,15 @@ yyreduce:
 
 			if(var_num)
 				code("\n\t\tSUBS\t%%15,$%d,%%15", 4*var_num);
-			code("\n@%s_body:", get_name(fun_idx));
+				
+				code("\n@%s_body:", get_name(fun_idx));
 			
 		}
-#line 1573 "freud.tab.c"
+#line 1574 "freud.tab.c"
     break;
 
   case 17:
-#line 187 "freud.y"
+#line 188 "freud.y"
                 {
 			//ZBOG TEST FAJLOVA MAIN BEZ RETUN-A PROLAZI BEZ WARNINGA!
 			if (has_return == 0 && get_type(fun_idx)!=VOID) 
@@ -1581,11 +1582,11 @@ yyreduce:
 				warn("no return statement in %s", get_name(fun_idx));
 			
 		}
-#line 1585 "freud.tab.c"
+#line 1586 "freud.tab.c"
     break;
 
   case 20:
-#line 204 "freud.y"
+#line 205 "freud.y"
       { 
       if ((yyvsp[0].i) == VOID) err("invalid variable type");
       type_temp = (yyvsp[0].i); 
@@ -1593,22 +1594,22 @@ yyreduce:
       
       printf("%d",type_temp);
       }
-#line 1597 "freud.tab.c"
+#line 1598 "freud.tab.c"
     break;
 
   case 22:
-#line 216 "freud.y"
+#line 217 "freud.y"
                 {
 			if(lookup_symbol((yyvsp[0].s), VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
 			int idx = insert_symbol((yyvsp[0].s), VAR, type_temp, ++var_num, NO_ATR);
 			
 			declare_vars[declare_vars_num] = idx;
 		}
-#line 1608 "freud.tab.c"
+#line 1609 "freud.tab.c"
     break;
 
   case 23:
-#line 223 "freud.y"
+#line 224 "freud.y"
                 {
 			if(lookup_symbol((yyvsp[0].s), VAR|PAR|GL) != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
 			int idx = insert_symbol((yyvsp[0].s), VAR, type_temp, ++var_num, NO_ATR);
@@ -1616,23 +1617,23 @@ yyreduce:
 			declare_vars_num++;
 			declare_vars[declare_vars_num] = idx;
 		}
-#line 1620 "freud.tab.c"
+#line 1621 "freud.tab.c"
     break;
 
   case 24:
-#line 234 "freud.y"
+#line 236 "freud.y"
                 {
 			if(get_type((yyvsp[0].i)) != type_temp) err("incompatible types in assignment");
 
-			for (int i = 0; i<declare_vars_num; i++)
+			for (int i = 0; i<=declare_vars_num; i++)
 				gen_mov((yyvsp[0].i), declare_vars[i]);
 			
 		}
-#line 1632 "freud.tab.c"
+#line 1633 "freud.tab.c"
     break;
 
   case 37:
-#line 266 "freud.y"
+#line 268 "freud.y"
                 {
 			int idx = lookup_symbol((yyvsp[-3].s), VAR|PAR|GL);
 			if (idx == NO_INDEX) err("invalid value '%s' in assignment", (yyvsp[-3].s));
@@ -1641,11 +1642,11 @@ yyreduce:
 			gen_mov((yyvsp[-1].i), idx);
 
 		}
-#line 1645 "freud.tab.c"
+#line 1646 "freud.tab.c"
     break;
 
   case 38:
-#line 278 "freud.y"
+#line 280 "freud.y"
                 {
 			if(is_postinc) {
 				  	
@@ -1682,11 +1683,11 @@ yyreduce:
   	  	is_postinc = 0;
     	} else last_was_inc = 0;
 		}
-#line 1686 "freud.tab.c"
+#line 1687 "freud.tab.c"
     break;
 
   case 39:
-#line 315 "freud.y"
+#line 317 "freud.y"
                 {
     	if(get_type((yyvsp[-2].i)) != get_type((yyvsp[0].i))) err("invalid operands: arithmetic operation");
     	int t1 = get_type((yyvsp[-2].i));
@@ -1701,7 +1702,6 @@ yyreduce:
   	  	code(",");
   	  	free_if_reg((yyvsp[0].i));
   	  	free_if_reg(postinc_stm);
-  	  	free_if_reg((yyval.i));
  	  	 	(yyval.i) = take_reg();
   	  	gen_sym_name((yyval.i));
   	  	set_type((yyval.i), t1);
@@ -1759,7 +1759,7 @@ yyreduce:
     break;
 
   case 41:
-#line 388 "freud.y"
+#line 389 "freud.y"
                 {
 			is_postinc++;
 			(yyval.i) = (yyvsp[0].i);
@@ -1768,7 +1768,7 @@ yyreduce:
     break;
 
   case 42:
-#line 393 "freud.y"
+#line 394 "freud.y"
                 {
 			//Ne sme biti void
 			int idx = fcall_idx;
@@ -1780,7 +1780,7 @@ yyreduce:
     break;
 
   case 43:
-#line 401 "freud.y"
+#line 402 "freud.y"
                 {
       (yyval.i) = lookup_symbol((yyvsp[0].s), VAR|PAR|GL);
       if((yyval.i) == NO_INDEX) err("'%s' undeclared", (yyvsp[0].s));
@@ -1789,25 +1789,25 @@ yyreduce:
     break;
 
   case 44:
-#line 406 "freud.y"
+#line 407 "freud.y"
                 { (yyval.i) = (yyvsp[-1].i); }
 #line 1795 "freud.tab.c"
     break;
 
   case 45:
-#line 411 "freud.y"
+#line 412 "freud.y"
                 { (yyval.i) = insert_literal((yyvsp[0].s), INT);	}
 #line 1801 "freud.tab.c"
     break;
 
   case 46:
-#line 413 "freud.y"
+#line 414 "freud.y"
                 {	(yyval.i) = insert_literal((yyvsp[0].s), UINT); }
 #line 1807 "freud.tab.c"
     break;
 
   case 47:
-#line 418 "freud.y"
+#line 419 "freud.y"
                 {
     	fcall_idx = lookup_symbol((yyvsp[0].s), FUN);
       if(fcall_idx == NO_INDEX) err("'%s' is not a function", (yyvsp[0].s));
@@ -1817,7 +1817,7 @@ yyreduce:
     break;
 
   case 48:
-#line 424 "freud.y"
+#line 425 "freud.y"
     {
     
     //U slucaju pogresnog broja parametara ne ispisuju se greske u tipovima
@@ -1825,7 +1825,16 @@ yyreduce:
     		err("wrong number of arguments in function call '%s'", get_name(fcall_idx));
     	else if (par_err != 0) 
 				err("incompatible type for argument in '%s'", get_name(fcall_idx));
-    		
+    	
+    	//Generisanje koda:	
+    	
+    		//Stack
+    	for (int i = arg_num; i>0; i--) {
+    		free_if_reg(args_for_stack[i]);
+				code("\n\t\t\tPUSH\t");
+				gen_sym_name(args_for_stack[i]);
+			}
+    	
     	code("\n\t\t\tCALL\t%s", get_name(fcall_idx));	
     						
 			if (get_atr1(fcall_idx) > 0)
@@ -1834,98 +1843,100 @@ yyreduce:
     	set_type(FUN_REG, get_type(fcall_idx));
       (yyval.i) = FUN_REG;
     }
-#line 1838 "freud.tab.c"
+#line 1847 "freud.tab.c"
     break;
 
   case 49:
-#line 444 "freud.y"
+#line 454 "freud.y"
                 { (yyval.i) = 0; 
 			arg_num = 0;}
-#line 1845 "freud.tab.c"
+#line 1854 "freud.tab.c"
     break;
 
   case 50:
-#line 447 "freud.y"
+#line 457 "freud.y"
                 {	
 			arg_num = 1;
 			(yyval.i) = 1;
 			if (get_param_type(fcall_idx, arg_num) != get_type((yyvsp[0].i))) par_err++;
 			
-			free_if_reg((yyvsp[0].i));
-			code("\n\t\t\tPUSH\t");
-			gen_sym_name((yyvsp[0].i));
+			//Gen
+			args_for_stack[arg_num] = (yyvsp[0].i);
 					
 		}
-#line 1860 "freud.tab.c"
+#line 1868 "freud.tab.c"
     break;
 
   case 51:
-#line 459 "freud.y"
+#line 468 "freud.y"
                 {
 			arg_num++;
 			(yyval.i) = arg_num;
-		//	warn("%d and %d", get_type($3), get_param_type(fcall_idx, arg_num));
 			if (get_type((yyvsp[0].i)) != get_param_type(fcall_idx, arg_num))	par_err++;
+			
+			
+			//Gen
+			args_for_stack[arg_num] = (yyvsp[0].i);
 		}
-#line 1871 "freud.tab.c"
+#line 1882 "freud.tab.c"
     break;
 
   case 52:
-#line 469 "freud.y"
+#line 481 "freud.y"
                 {
 			//Mora biti void
 			int idx = fcall_idx;
 			if (get_type(idx) != VOID) err("incorrect call of non-void function '%s'", get_name(idx));
 		}
-#line 1881 "freud.tab.c"
+#line 1892 "freud.tab.c"
     break;
 
   case 53:
-#line 478 "freud.y"
+#line 490 "freud.y"
                 {
 			code("\n@exit%d:", (yyvsp[0].i));
 		}
-#line 1889 "freud.tab.c"
+#line 1900 "freud.tab.c"
     break;
 
   case 54:
-#line 482 "freud.y"
+#line 494 "freud.y"
                 {
 			code("\n@exit%d:", (yyvsp[-2].i));
 		}
-#line 1897 "freud.tab.c"
+#line 1908 "freud.tab.c"
     break;
 
   case 55:
-#line 490 "freud.y"
+#line 502 "freud.y"
                 {
 			(yyval.i) = ++lab_num;
 			code("\n@if%d:", lab_num);
 		}
-#line 1906 "freud.tab.c"
+#line 1917 "freud.tab.c"
     break;
 
   case 56:
-#line 495 "freud.y"
+#line 507 "freud.y"
                 {
 			code("\n\t\t%s\t@false%d", opp_jumps[(yyvsp[0].i)], (yyvsp[-1].i));
 			code("\n@true%d:", (yyvsp[-1].i));
 		}
-#line 1915 "freud.tab.c"
+#line 1926 "freud.tab.c"
     break;
 
   case 57:
-#line 500 "freud.y"
+#line 512 "freud.y"
                 {
 			code("\n\t\tJMP \t@exit%d", (yyvsp[-4].i));
       code("\n@false%d:", (yyvsp[-4].i));
       (yyval.i) = (yyvsp[-4].i);
 		}
-#line 1925 "freud.tab.c"
+#line 1936 "freud.tab.c"
     break;
 
   case 58:
-#line 509 "freud.y"
+#line 521 "freud.y"
                 {
 			if (get_type((yyvsp[-2].i)) != get_type((yyvsp[0].i))) 
 				err("invalid operands: relational operator");			
@@ -1934,11 +1945,11 @@ yyreduce:
 			gen_cmp((yyvsp[-2].i), (yyvsp[0].i));	
 			
 		}
-#line 1938 "freud.tab.c"
+#line 1949 "freud.tab.c"
     break;
 
   case 59:
-#line 521 "freud.y"
+#line 533 "freud.y"
                 {
 			has_return++;
 		
@@ -1948,21 +1959,21 @@ yyreduce:
 			gen_mov((yyvsp[-1].i), FUN_REG);
 			code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));
 		}
-#line 1952 "freud.tab.c"
+#line 1963 "freud.tab.c"
     break;
 
   case 60:
-#line 531 "freud.y"
+#line 543 "freud.y"
                 {
 			has_return++;
 		
 			if (get_type(fun_idx) != VOID) warn("missing return statement");
 		}
-#line 1962 "freud.tab.c"
+#line 1973 "freud.tab.c"
     break;
 
   case 61:
-#line 540 "freud.y"
+#line 552 "freud.y"
                 {
 			int idx = lookup_symbol(get_name((yyvsp[-1].i)), GL);
 			if (idx != NO_INDEX) {
@@ -1992,11 +2003,11 @@ yyreduce:
 			is_postinc = 0;
 		
 		}
-#line 1996 "freud.tab.c"
+#line 2007 "freud.tab.c"
     break;
 
   case 62:
-#line 573 "freud.y"
+#line 585 "freud.y"
                 {
       int idx = lookup_symbol((yyvsp[-1].s), VAR|PAR|GL);
 			if (idx == NO_INDEX) err("invalid lvalue '%s'", (yyvsp[-1].s));
@@ -2004,51 +2015,51 @@ yyreduce:
 			idx = take_reg();
 
     }
-#line 2008 "freud.tab.c"
+#line 2019 "freud.tab.c"
     break;
 
   case 63:
-#line 584 "freud.y"
+#line 596 "freud.y"
                 {
 			int para_idx = lookup_symbol((yyvsp[0].s), VAR|PAR|GL);
 			if(para_idx != NO_INDEX) err("redefinition of '%s'", (yyvsp[0].s));
 			else if ((yyvsp[-1].i) == VOID) err("invalid variable type in para");
 			else insert_symbol((yyvsp[0].s), VAR, (yyvsp[-1].i), ++var_num, NO_ATR);
 		}
-#line 2019 "freud.tab.c"
+#line 2030 "freud.tab.c"
     break;
 
   case 64:
-#line 591 "freud.y"
+#line 603 "freud.y"
                 {
 			if (get_type((yyvsp[-6].i)) != (yyvsp[-10].i)) err("assignment types not matching");
 			if (lookup_symbol((yyvsp[-9].s), VAR) != lookup_symbol((yyvsp[-2].s), VAR)) err("para numerators not matching");
 		}
-#line 2028 "freud.tab.c"
+#line 2039 "freud.tab.c"
     break;
 
   case 66:
-#line 600 "freud.y"
+#line 612 "freud.y"
                 {
 			sw_temp = lookup_symbol((yyvsp[-1].s), VAR|PAR|GL);
 			if(sw_temp == NO_INDEX) err("variable '%s' in switch statement not found", (yyvsp[-1].s));
 			case_int++;		//Brojac trenutnog switch-a po redu
 		}
-#line 2038 "freud.tab.c"
+#line 2049 "freud.tab.c"
     break;
 
   case 72:
-#line 620 "freud.y"
+#line 632 "freud.y"
                 {
 			if (get_type((yyvsp[0].i)) != get_type(sw_temp)) err("invalid literal type in switch");
 				else if (get_atr1((yyvsp[0].i)) == case_int) err("literal values must be unique");
 					else set_atr1((yyvsp[0].i), case_int);
 		}
-#line 2048 "freud.tab.c"
+#line 2059 "freud.tab.c"
     break;
 
 
-#line 2052 "freud.tab.c"
+#line 2063 "freud.tab.c"
 
       default: break;
     }
@@ -2280,7 +2291,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 634 "freud.y"
+#line 646 "freud.y"
 
 
 int yyerror(char *s) {
