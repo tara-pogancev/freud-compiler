@@ -1,0 +1,19 @@
+//OPIS: Funkcije vise promenljivih
+//RETURN: 8
+
+int f(int a, int b, int c) {	
+	return a + b - c;
+}
+
+int main() {
+  int a, b, c, d;
+  
+  a = 4;
+  b = 5;
+  c = 1;
+  
+  d = f(a, b, c);  
+  
+  return d;
+}
+

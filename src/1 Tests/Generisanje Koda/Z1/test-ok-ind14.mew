@@ -1,0 +1,20 @@
+//OPIS: Funkcije vise promenljivih
+//RETURN: 30
+
+int x;
+
+int f(int a, int b, int c) {
+	
+	return a + b + c;
+}
+
+int main() {
+  int x1 = 15;
+  int x2 = 10;
+  int x3 = 10;
+  
+  x = f(x1, 5, x3);  
+  
+  return x;
+}
+

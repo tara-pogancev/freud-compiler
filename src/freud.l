@@ -36,6 +36,7 @@
 "="								{ return _ASSIGN; }
 ","								{ return _COMMA; }
 "++"							{ return _POSTINC; }
+"?"								{ return _QUESTION; }
 
 "+"								{ yylval.i = ADD; return _OP; }
 "-"								{ yylval.i = SUB; return _OP; }	

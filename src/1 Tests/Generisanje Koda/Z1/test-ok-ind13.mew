@@ -1,0 +1,25 @@
+//OPIS: Funkcije vise promenljivih
+//RETURN: 15
+
+int x;
+
+int max(int a, int b) {
+	
+	int res;
+	
+	if (a > b)
+		res = a;
+	else res = b;
+	
+	return res;
+}
+
+int main() {
+  int a = 15;
+  int b = 10;
+  
+  x = max(a, b);  
+  
+  return x;
+}
+

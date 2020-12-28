@@ -1,6 +1,6 @@
 //OPIS: Sanity check za miniC gramatiku
 
-int global;
+int global;	//16
 unsigned global_u;
 
 int f(int x) {
@@ -122,6 +122,9 @@ int main() {
      	default: b = 5;
     
     }
+    
+    //15
+    a = (a == b) ? a : 0;
     
     return 0;
 }

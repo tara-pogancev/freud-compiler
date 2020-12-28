@@ -1,0 +1,22 @@
+//OPIS: Vise funkcija
+//RETURN: 23
+
+int f1(int a) {	
+	return a + a;
+}
+
+int f2(int a){
+	return a + a + a;
+}
+
+int main() {
+  int a, b, r;
+  
+  a = 4;
+  b = 5;
+  
+ r = f1(a) + f2(b); 
+  
+  return r;
+}
+

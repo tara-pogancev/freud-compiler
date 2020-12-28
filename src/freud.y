@@ -62,6 +62,7 @@
 %token _ASSIGN
 %token _COMMA
 %token _POSTINC
+%token _QUESTION
 
 %token <i> _OP
 %token <i> _RELOP
@@ -78,7 +79,7 @@
 %token _CASE
 %token _FINISH
 
-%type <i> num_exp exp literal function_call argument relation postinc_var if_part postinc_statement
+%type <i> num_exp exp literal function_call argument relation postinc_var if_part postinc_statement conditional_exp conditional_case
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
@@ -284,7 +285,6 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
  		   	postinc_stm = take_reg();
  		   	gen_mov($1, postinc_stm);
  		    set_type(postinc_stm, get_type($1)); 		    
- 		    $$ = postinc_stm;
 			
 				int idx = lookup_symbol(get_name($1), GL);
 				if (idx != NO_INDEX) {
@@ -302,13 +302,11 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 					code("\n\t\tADDS\t");
 				else code("\n\t\tADDU\t");
 			
-				free_if_reg($1);
-				$1 = take_reg();
-			
+						
 				gen_sym_name(idx);
 				code(",$1,");
 				gen_sym_name(idx);
-				set_type($1, get_type(idx));
+				free_if_reg($1);
 			}
   	  	is_postinc = 0;
     	} else last_was_inc = 0;
@@ -316,8 +314,8 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 	| num_exp _OP exp
 		{
     	if(get_type($1) != get_type($3)) err("invalid operands: arithmetic operation");
-    	int t1 = get_type($1);
     	
+    	int t1 = get_type($1);
     	code("\n\t\t%s\t", ar_instructions[$2 + (t1-1) * AROP_NUMBER]);
     	
     	 if (last_was_inc) {
@@ -334,13 +332,14 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 
 		   	postinc_stm = 0;
   	  	last_was_inc = 0;
+  	  	
   	  } else {
 
    		 	gen_sym_name($1);
   	  	code(",");
   	  	gen_sym_name($3);
   	  	code(",");
-  	  	free_if_reg($3);
+   	  	free_if_reg($3);
   	  	free_if_reg($1);
  	  	 	$$ = take_reg();
   	  	gen_sym_name($$);
@@ -365,14 +364,11 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 				if (get_type(idx)==INT)
 					code("\n\t\tADDS\t");
 				else code("\n\t\tADDU\t");
-			
-				free_if_reg($3);
-				$3 = take_reg();
-			
+						
 				gen_sym_name(idx);
 				code(",$1,");
 				gen_sym_name(idx);
-				set_type($3, get_type(idx));
+				free_if_reg($3);
 			}
     		
     		is_postinc = 0;
@@ -405,6 +401,7 @@ exp	//Sve sto moze biti clan aritmetickog izraza
     }
 	| _LPAREN num_exp _RPAREN
 		{ $$ = $2; }
+	| conditional_case
 	;	
 	
 literal
@@ -566,13 +563,10 @@ postinc_statement
 					code("\n\t\tADDS\t");
 				else code("\n\t\tADDU\t");
 			
-				free_if_reg($1);
-				$$ = take_reg();
-			
 				gen_sym_name(idx);
 				code(",$1,");
 				gen_sym_name(idx);
-				set_type($$, get_type(idx));
+				free_if_reg($1);
 			}
 			
 			is_postinc = 0;
@@ -642,6 +636,22 @@ case_part
 	| _COLON statement _FINISH _SEMI
 	;
 	
+conditional_case	
+	: _LPAREN relation _RPAREN _QUESTION conditional_exp _COLON conditional_exp
+		{
+			if (get_type($5)!=get_type($7)) err("One or more invalid variable types in conditional case!");
+			$$ = $5;
+		}
+	;
+	
+conditional_exp	
+	:	_ID
+		{
+      $$ = lookup_symbol($1, VAR|PAR|GL);
+      if($$ == NO_INDEX) err("'%s' undeclared", $1);
+		}
+	| literal
+	;
 	
 %%
 

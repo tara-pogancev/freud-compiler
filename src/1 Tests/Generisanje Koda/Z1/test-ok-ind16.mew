@@ -1,0 +1,22 @@
+//OPIS: Funkcije vise promenljivih i globalne promenljive
+//RETURN: 13
+
+int gl;
+
+int f(int a, int b) {	
+	gl = 4;
+	return a + b + gl;
+}
+
+int main() {
+  int a, b, d;
+  
+  a = 4;
+  b = 5;
+  gl = 7;
+  
+  d = f(a, b);  
+  
+  return d;
+}
+
