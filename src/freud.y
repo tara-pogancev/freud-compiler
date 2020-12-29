@@ -34,9 +34,7 @@
   
   int declare_vars[10];
   int declare_vars_num = 0;
-  int is_postinc = 0;
-  int postinc_stm = 0;
-  int last_was_inc = 0;
+  int postinc_stm = -1;
   int args_for_stack[10];
 
 %}
@@ -106,9 +104,13 @@ global_var
 	: _TYPE _ID _SEMI 
 		{
 			if ($1 == VOID) err("invalid variable type '%s'", $2);
-			if (lookup_symbol($2, GL) != -1) err("redefinition of '%s'", $2);
-			insert_symbol($2, GL, $1, NO_ATR, NO_ATR);
-			code("\n%s:\n\t\tWORD\t1", $2);
+			 else if (lookup_symbol($2, GL) != -1) err("redefinition of '%s'", $2);
+				else {
+			
+					insert_symbol($2, GL, $1, NO_ATR, NO_ATR);
+					code("\n%s:\n\t\tWORD\t1", $2);
+					
+					}
 
 		}
 	;
@@ -123,7 +125,7 @@ function
 		{
 			fun_idx = lookup_symbol($2, FUN);
 			if (fun_idx == NO_INDEX) fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
-			else err("redefinition of function '%s'", $2);
+				else err("redefinition of function '%s'", $2);
 			par_num = 0;
 			has_return = 0;
 			
@@ -270,71 +272,25 @@ assign_statement
 			int idx = lookup_symbol($1, VAR|PAR|GL);
 			if (idx == NO_INDEX) err("invalid value '%s' in assignment", $1);
 			else if(get_type(idx) != get_type($3)) err("incompatible types in assignment");
-						
+			else {
+			
 			gen_mov($3, idx);
+			
+			}
 
 		}
 	;
 	
 num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
 	: exp
-		{
-			if(is_postinc) {
-				  	
-				last_was_inc++;  	  	
- 		   	postinc_stm = take_reg();
- 		   	gen_mov($1, postinc_stm);
- 		    set_type(postinc_stm, get_type($1)); 		    
-			
-				int idx = lookup_symbol(get_name($1), GL);
-				if (idx != NO_INDEX) {
-					//Globalna prom
-					if (get_type(idx)==INT)
-						code("\n\t\tADDS\t");
-					else code("\n\t\tADDU\t");
-					code("%s,$1,%s", get_name(idx), get_name(idx));
-				}	
-			else {
-			
-				idx = lookup_symbol(get_name($1), VAR|PAR);
-			
-				if (get_type(idx)==INT)
-					code("\n\t\tADDS\t");
-				else code("\n\t\tADDU\t");
-			
-						
-				gen_sym_name(idx);
-				code(",$1,");
-				gen_sym_name(idx);
-				free_if_reg($1);
-			}
-  	  	is_postinc = 0;
-    	} else last_was_inc = 0;
-		}		
 	| num_exp _OP exp
 		{
     	if(get_type($1) != get_type($3)) err("invalid operands: arithmetic operation");
+    		else {
     	
     	int t1 = get_type($1);
     	code("\n\t\t%s\t", ar_instructions[$2 + (t1-1) * AROP_NUMBER]);
-    	
-    	 if (last_was_inc) {
-  	    	  
-  	  	gen_sym_name(postinc_stm);
-  	  	code(",");
-  	  	gen_sym_name($3);
-  	  	code(",");
-  	  	free_if_reg($3);
-  	  	free_if_reg(postinc_stm);
- 	  	 	$$ = take_reg();
-  	  	gen_sym_name($$);
-  	  	set_type($$, t1);
-
-		   	postinc_stm = 0;
-  	  	last_was_inc = 0;
-  	  	
-  	  } else {
-
+    
    		 	gen_sym_name($1);
   	  	code(",");
   	  	gen_sym_name($3);
@@ -344,38 +300,8 @@ num_exp	//Brojni izraz 4+5-8... ima konkretnu vrednost
  	  	 	$$ = take_reg();
   	  	gen_sym_name($$);
   	  	set_type($$, t1);
-  	  	
-  	  }
-    	
- 	  	if (is_postinc){
-    		
-			int idx = lookup_symbol(get_name($3), GL);
-				if (idx != NO_INDEX) {
-					//Globalna prom
-					if (get_type(idx)==INT)
-						code("\n\t\tADDS\t");
-					else code("\n\t\tADDU\t");
-					code("%s,$1,%s", get_name(idx), get_name(idx));
-				}	
-			else {
-			
-				idx = lookup_symbol(get_name($3), VAR|PAR);
-			
-				if (get_type(idx)==INT)
-					code("\n\t\tADDS\t");
-				else code("\n\t\tADDU\t");
-						
-				gen_sym_name(idx);
-				code(",$1,");
-				gen_sym_name(idx);
-				free_if_reg($3);
-			}
-    		
-    		is_postinc = 0;
+		
     	}
-    	
-    	last_was_inc = 0;
-    	
     }
 	;
 
@@ -383,8 +309,7 @@ exp	//Sve sto moze biti clan aritmetickog izraza
 	: literal
 	| postinc_var
 		{
-			is_postinc++;
-			$$ = $1;
+			$$ = postinc_stm;
 		}
 	| function_call
 		{
@@ -519,9 +444,10 @@ relation
 			if (get_type($1) != get_type($3)) 
 				err("invalid operands: relational operator");			
 
-			$$ = $2 + ((get_type($1)-1)*RELOP_NUMBER);
-			gen_cmp($1, $3);	
-			
+			else {
+				$$ = $2 + ((get_type($1)-1)*RELOP_NUMBER);
+				gen_cmp($1, $3);	
+			}
 		}
 	;	
 	
@@ -533,8 +459,10 @@ return_statement
 			if (get_type(fun_idx) == VOID) err("return statement found in void function");
 			else if (get_type(fun_idx) != get_type($2)) err("incompatible types in return");
 			
-			gen_mov($2, FUN_REG);
-			code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));
+				else {
+					gen_mov($2, FUN_REG);
+					code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));
+					}
 		}
 	| _RETURN _SEMI
 		{
@@ -546,42 +474,44 @@ return_statement
 
 postinc_statement
 	: postinc_var _SEMI
-		{
-			int idx = lookup_symbol(get_name($1), GL);
-			if (idx != NO_INDEX) {
-				//Globalna prom
-				if (get_type(idx)==INT)
-					code("\n\t\tADDS\t");
-				else code("\n\t\tADDU\t");
-				code("%s,$1,%s", get_name(idx), get_name(idx));
-			}	
-			else {
-			
-				idx = lookup_symbol(get_name($1), VAR|PAR);
-			
-				if (get_type(idx)==INT)
-					code("\n\t\tADDS\t");
-				else code("\n\t\tADDU\t");
-			
-				gen_sym_name(idx);
-				code(",$1,");
-				gen_sym_name(idx);
-				free_if_reg($1);
-			}
-			
-			is_postinc = 0;
-		
-		}
 	;
 
 postinc_var
 	: _ID _POSTINC
 		{
       int idx = lookup_symbol($1, VAR|PAR|GL);
-			if (idx == NO_INDEX) err("invalid lvalue '%s'", $1);
-			$$ = idx;
-			idx = take_reg();
-
+      $$ = idx;
+			if (idx == NO_INDEX) err("invalid value '%s'", $1);
+			else {
+	
+				if (postinc_stm == -1)	free_if_reg(postinc_stm);
+ 		   	postinc_stm = take_reg();
+ 		   	gen_mov(idx, postinc_stm);
+ 		    set_type(postinc_stm, get_type(idx)); 		      
+			
+			int idx = lookup_symbol($1, GL);
+			if (idx != NO_INDEX) {
+					//Globalna prom
+					if (get_type(idx)==INT)
+						code("\n\t\tADDS\t");
+					else code("\n\t\tADDU\t");
+					code("%s,$1,%s", get_name(idx), get_name(idx));
+				}	
+			else {
+			
+				idx = lookup_symbol($1, VAR|PAR);
+			
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+						
+				gen_sym_name(idx);
+				code(",$1,");
+				gen_sym_name(idx);
+				free_if_reg(idx);
+			}
+			}
+	
     }
 	;
 	
