@@ -1,0 +1,12 @@
+//Opis: Ternarni operator
+//RETURN: 9
+int main(){
+
+	int a = 8;
+	int b = 9;
+	int res,c;
+	
+	res = (a > b) ? a : b;
+
+	return res;
+}

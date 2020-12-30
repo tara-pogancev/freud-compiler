@@ -567,10 +567,26 @@ case_part
 	;
 	
 conditional_case	
-	: _LPAREN relation _RPAREN _QUESTION conditional_exp _COLON conditional_exp
+	: _LPAREN relation
 		{
-			if (get_type($5)!=get_type($7)) err("One or more invalid variable types in conditional case!");
-			$$ = $5;
+			$<i>$ = ++lab_num;
+			code("\n@if%d:", lab_num);
+			code("\n\t\t%s\t@false%d", opp_jumps[$2], lab_num);
+			code("\n@true%d:", lab_num);
+		}
+		_RPAREN _QUESTION conditional_exp _COLON conditional_exp
+		{
+			if (get_type($6)!=get_type($8)) err("One or more invalid variable types in conditional case!");
+				else {
+			$$ = take_reg();
+			set_type($$, get_type($6));
+			gen_mov($6, $$);
+			code("\n\t\tJMP\t@exit%d", lab_num);
+			code("\n@false%d:", lab_num);
+			gen_mov($8, $$);
+			code("\n@exit%d:", lab_num);
+
+			}
 		}
 	;
 	
