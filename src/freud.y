@@ -30,7 +30,9 @@
   int arg_num = 0;
   int par_err = 0;
   
-  int case_int = 0;
+  int case_int = 0;	//Redni broj case-a
+  int case_num = 0; //Trenutni broj case-a koji se posmatra
+  
   
   int declare_vars[10];
   int declare_vars_num = 0;
@@ -543,7 +545,15 @@ switch_statement	//Individualni 3: switch case
 	
 switch_part	//deo posle inicijalizacije switch-a	
 	:	_LBRACKET cases _RBRACKET	//no default
+		{
+			code("\n@sw_exit%d:", case_int);
+		}
 	|	_LBRACKET cases _DEFAULT _COLON statement _RBRACKET	//default
+		{
+			//Ovde ce se generisati statement koji svakako ide posle poslednjeg case-a.
+			code("\n@sw_true%d:", ++case_num);
+			code("\n@sw_exit%d:", case_int);
+		}
 	;
 	
 cases
@@ -556,23 +566,43 @@ case
 		{
 			if (get_type($2) != get_type(sw_temp)) err("invalid literal type in switch");
 				else if (get_atr1($2) == case_int) err("literal values must be unique");
-					else set_atr1($2, case_int);
+					else { 
+					
+			set_atr1($2, case_int);
+					
+			$<i>$ = ++case_num;
+			code("\n@sw%d:", $<i>$);
+			gen_cmp(sw_temp, $2);
+			code("\n\t\tJNE\t@sw_false%d", $<i>$);
+			code("\n@sw_true%d:", $<i>$);
+			
+			}
 		}
 		case_part
+		{
+			//Nakon generisanja statementa
+			code("\n@sw_false%d:", $<i>3);
+		}
 	;
 	
 case_part
 	:	_COLON statement %prec NO_FINISH
+		{
+			code("\n\t\tJMP\t@sw_true%d", case_num+1);
+		}
 	| _COLON statement _FINISH _SEMI
+		{
+			code("\n\t\tJMP\t@sw_exit%d", case_int);
+		}
 	;
 	
 conditional_case	
 	: _LPAREN relation
 		{
 			$<i>$ = ++lab_num;
-			code("\n@if%d:", lab_num);
-			code("\n\t\t%s\t@false%d", opp_jumps[$2], lab_num);
-			code("\n@true%d:", lab_num);
+			code("\n@if%d:", $<i>$);
+			code("\n\t\t%s\t@false%d", opp_jumps[$2], $<i>$);
+			code("\n@true%d:", $<i>$);
 		}
 		_RPAREN _QUESTION conditional_exp _COLON conditional_exp
 		{
@@ -581,11 +611,10 @@ conditional_case
 			$$ = take_reg();
 			set_type($$, get_type($6));
 			gen_mov($6, $$);
-			code("\n\t\tJMP\t@exit%d", lab_num);
-			code("\n@false%d:", lab_num);
+			code("\n\t\tJMP\t@exit%d", $<i>3);
+			code("\n@false%d:", $<i>3);
 			gen_mov($8, $$);
-			code("\n@exit%d:", lab_num);
-
+			code("\n@exit%d:", $<i>3);
 			}
 		}
 	;
