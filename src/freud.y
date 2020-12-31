@@ -33,6 +33,7 @@
   int case_int = 0;	//Redni broj case-a
   int case_num = 0; //Trenutni broj case-a koji se posmatra
   
+  int para_num = -1; //Broj para iskaza
   
   int declare_vars[10];
   int declare_vars_num = 0;
@@ -513,24 +514,69 @@ postinc_var
 				free_if_reg(idx);
 			}
 			}
-	
     }
 	;
 	
 para_statement	//Individualni 2: para
 	: _PARA _LPAREN _TYPE _ID
 		{
+			code("\n@para_init%d:", ++para_num);
+			$<i>$ = para_num;
+			
 			int para_idx = lookup_symbol($4, VAR|PAR|GL);
 			if(para_idx != NO_INDEX) err("redefinition of '%s'", $4);
 			else if ($3 == VOID) err("invalid variable type in para");
-			else insert_symbol($4, VAR, $3, ++var_num, NO_ATR);
+			else {
+					insert_symbol($4, VAR, $3, ++var_num, NO_ATR);
+					para_idx = take_reg();
+					set_type($3, para_idx);
+				}
 		}
-		 _ASSIGN num_exp _SEMI relation _SEMI _ID _POSTINC _RPAREN 
+		 _ASSIGN num_exp _SEMI 
 		{
-			if (get_type($7) != $3) err("assignment types not matching");
-			if (lookup_symbol($4, VAR) != lookup_symbol($11, VAR)) err("para numerators not matching");
+			int para_idx = lookup_symbol($4, VAR|PAR|GL);
+			gen_mov($7, para_idx);	//Inicijalizovanje vrednosti brojaca
+			code("\n@para_it%d:", $<i>5);	//Pocetna provera para iteracije
+		}
+		relation 
+		{
+			code("\n\t\t%s\t@para_exit%d", opp_jumps[$10], $<i>5);	
+		}
+		_SEMI _ID _POSTINC _RPAREN 
+		{
+			if (lookup_symbol($4, VAR) != lookup_symbol($13, VAR)) err("para numerators not matching");
 		}
 		statement
+		{
+			//Kraj para: Povecati inc, proveriti condition
+	
+			int idx = lookup_symbol($4, GL);
+			if (idx != NO_INDEX) {
+					//Globalna prom
+					if (get_type(idx)==INT)
+						code("\n\t\tADDS\t");
+					else code("\n\t\tADDU\t");
+					code("%s,$1,%s", get_name(idx), get_name(idx));
+				}	
+			else {
+			
+				idx = lookup_symbol($4, VAR|PAR);
+			
+				if (get_type(idx)==INT)
+					code("\n\t\tADDS\t");
+				else code("\n\t\tADDU\t");
+						
+				gen_sym_name(idx);
+				code(",$1,");
+				gen_sym_name(idx);
+				free_if_reg(idx);
+			}
+			
+			code("\n\t\tJMP\t@para_it%d", $<i>5);	
+			
+			//Izlazak iz para-stm
+			code("\n@para_exit%d:", $<i>5);
+		}
 	;
 	
 switch_statement	//Individualni 3: switch case
@@ -548,10 +594,13 @@ switch_part	//deo posle inicijalizacije switch-a
 		{
 			code("\n@sw_exit%d:", case_int);
 		}
-	|	_LBRACKET cases _DEFAULT _COLON statement _RBRACKET	//default
+	|	_LBRACKET cases _DEFAULT _COLON 
+		{
+			code("\n@sw_true%d:", ++case_num);
+		}
+		statement _RBRACKET	//default
 		{
 			//Ovde ce se generisati statement koji svakako ide posle poslednjeg case-a.
-			code("\n@sw_true%d:", ++case_num);
 			code("\n@sw_exit%d:", case_int);
 		}
 	;

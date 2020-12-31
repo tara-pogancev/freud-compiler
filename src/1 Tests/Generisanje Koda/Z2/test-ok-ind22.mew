@@ -1,0 +1,17 @@
+//OPIS: Individualni zadatak 2 - PARA, globalna, if
+//RETURN: 10
+
+int gl;
+
+int main() {
+		int a, b = 4;
+		gl = 2;
+		
+		para (int i = 0; i<6; i++){
+			if (i >= a) 
+				gl = gl + b;
+		}    	
+		
+    return gl;
+}
+

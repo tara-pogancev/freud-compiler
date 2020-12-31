@@ -1,5 +1,5 @@
 //OPIS: Switch case, no finish
-//RETURN: 60
+//RETURN: -1
 
 int main() {
   int a = 10;

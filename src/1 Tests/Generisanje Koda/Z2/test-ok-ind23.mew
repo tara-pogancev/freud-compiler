@@ -1,0 +1,16 @@
+//OPIS: Individualni zadatak 2 - PARA udnjezdeni
+//RETURN: 12
+
+int main() {
+		int a = 3;
+		int b = 4;
+		int res = 0;
+		
+		para (int i = 0; i<a; i++){
+			para (int j = 0; j<b; j++){
+				res++;
+			}
+		}    	
+    return res;
+}
+
