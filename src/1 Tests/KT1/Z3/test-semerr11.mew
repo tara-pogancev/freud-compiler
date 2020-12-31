@@ -1,0 +1,30 @@
+//OPIS: Individualni zadatak 3 - SWITCH CASE
+int main() {
+		int a, b;
+
+    switch [a] {
+    	case 1u :
+    		a = a + 5;
+				finish;
+    	case 5 :
+    		{
+    			b = 3;
+    		}
+    	case 7u :
+    		{
+    			b = 7;
+    		}	
+		 		finish;
+    	default :
+    		a = a - 1;
+    }
+    
+    switch [b] {
+    	case 1 :
+    		a = a + 5;
+    }
+    
+    	
+    return 0;
+}
+

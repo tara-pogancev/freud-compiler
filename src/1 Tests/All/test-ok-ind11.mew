@@ -1,0 +1,8 @@
+//OPIS: Dodela vrednosti vise deklarisanih promenljivih int a, b = 10;
+//RETURN: 30
+
+int main() {
+  int a, b, c = 10;
+  return a + b + c;
+}
+

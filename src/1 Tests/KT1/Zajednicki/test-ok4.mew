@@ -1,0 +1,11 @@
+//OPIS: void funkcija
+
+void fun(){
+}
+
+int main() {
+    int a,b;
+    int c,d,e,f;
+    unsigned g;
+    return 0;
+}

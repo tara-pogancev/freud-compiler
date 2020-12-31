@@ -1,0 +1,30 @@
+//OPIS: Switch case
+//RETURN: -1
+
+int main() {
+  int a = 65;
+  int b = 30;
+  int c = 40;
+  int d = 60;
+  
+  int res;
+  
+  switch [a] {
+  
+  	case 5:
+  		res = b;
+  		finish;
+  	case 10:
+  		res = c;
+  		finish;
+  	case 15:
+  		res = d;
+  		finish;
+  	default:
+  		res = -1;
+  	}
+  	
+  	return res;
+ 
+}
+

@@ -1,0 +1,26 @@
+//OPIS: Funckcija vise parametara greska
+void fun(int a, unsigned a){
+}
+
+int fun2(int a, unsigned b){
+	return 0;
+}
+
+int fun3(int a){
+	return 0;
+}
+
+int main() {
+    int a,b,c;
+    int d,e,f;
+    unsigned g,h,e;
+    int q,w;
+    void k;
+    
+    a = fun2(4, 3u);
+    
+    fun3(q);
+    
+    return 0;
+}
+

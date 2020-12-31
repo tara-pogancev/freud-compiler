@@ -1,0 +1,25 @@
+//OPIS: return
+
+unsigned fun(){
+	return 5u;
+}
+
+unsigned fun2(){	
+	return 0u;
+}
+
+
+void fun3(){
+	return;
+}
+
+void fun4(){
+}
+
+int main() {
+    int a,b;
+    int c,d,e,f;
+    unsigned g;
+    
+    return 0;
+}

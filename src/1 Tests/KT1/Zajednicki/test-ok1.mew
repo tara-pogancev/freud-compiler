@@ -1,0 +1,9 @@
+//OPIS: jedna deklaracija sa dve promenljive i a++;
+int main() {
+    int a,b;
+    a = 2;
+    b = 3;
+    a++;
+    b = 4 + a++;
+    return 0;
+}

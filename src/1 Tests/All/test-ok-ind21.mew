@@ -1,0 +1,14 @@
+//OPIS: Individualni zadatak 2 - PARA
+//RETURN: 3
+int main() {
+		int zbir = 0;
+		int razlika = 0;
+		
+		para (int i = 0; i<3; i++){
+			zbir = zbir + i;
+			razlika = razlika - i;
+		}    	
+		
+    return zbir;
+}
+
