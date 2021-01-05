@@ -10,15 +10,16 @@ Jednostavan komapjler ima ulogu sintaksnu, leksičku i semantičku analizu datog
 Nakon uspešne analize koda, generiše se _.asm_ datoteka sa prevedenim originalnim kodom na asemblerski jezik. Ovaj kod može se pokrenuti i testirati korišćenjem _Hipsim_ simulatora.
 
 Neke od *funkcionalnosti kompajlera* podrazumevaju:
-	- Rad sa int i unsigned vrednostima
-	- Rad sa funkcijama sa i bez povratne vrednosti (void)
-	- Osnovne aritmetičke operacije sabiranje i oduzimanje
-	- Postinkrementni operator
-	- Jednolinijske i višelinijske komentare
-	- Globalne promenljive
-	- Ternarni operator u okviru numeričkih izraza
-	- PARA iskaz (analogno logici for-statement-a)
-	- SWITCH - CASE
+
+	• Rad sa int i unsigned vrednostima
+	• Rad sa funkcijama sa i bez povratne vrednosti (void)
+	• Osnovne aritmetičke operacije sabiranje i oduzimanje
+	• Postinkrementni operator
+	• Jednolinijske i višelinijske komentare
+	• Globalne promenljive
+	• Ternarni operator u okviru numeričkih izraza
+	• PARA iskaz (analogno logici for-statement-a)
+	• SWITCH - CASE
 
 ## Upotreba kompajlera
 
