@@ -1,0 +1,27 @@
+//Test do_until
+//RETURN: 47
+
+int main() {
+
+	int a = 4;
+	int b = 7;
+	int c = 2;
+	int d;
+	
+	do {
+	
+		a++;
+		d = c + c;
+		
+		do {
+		
+			c++;
+			
+		} until (c > d);		
+		
+	
+	} until (a > b);		
+
+	
+	return c;
+}

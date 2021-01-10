@@ -1,0 +1,19 @@
+//Test do_until
+
+int main() {
+
+	int a = 4;
+	int b = 7;
+	
+	if (c > a) 
+		b = 5;
+	
+/*	do {
+	
+		a++;
+	
+	} until (c > b); */
+
+	
+	return 0;
+}

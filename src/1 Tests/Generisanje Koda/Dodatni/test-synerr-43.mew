@@ -1,0 +1,17 @@
+//Test do_until
+//RETURN: 8
+
+int main() {
+
+	int a = 4;
+	int b = 7;
+	
+	{
+	
+		a++;
+	
+	} until(a > b);
+
+	
+	return a + 1;
+}

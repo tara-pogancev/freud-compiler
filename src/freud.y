@@ -32,6 +32,7 @@
   
   int case_int = 0;	//Redni broj case-a
   int case_num = 0; //Trenutni broj case-a koji se posmatra
+  int du_num = 0;
   
   int para_num = -1; //Broj para iskaza
   
@@ -80,7 +81,10 @@
 %token _CASE
 %token _FINISH
 
-%type <i> num_exp exp literal function_call argument relation postinc_var if_part postinc_statement conditional_exp conditional_case
+%token _DO
+%token _UNTIL
+
+%type <i> num_exp exp literal function_call argument relation postinc_var if_part postinc_statement conditional_exp conditional_case until_statement
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
@@ -263,6 +267,7 @@ statement	//Jedan iskaz ili blok naredbi
 	| para_statement					//para(...)		
 	| switch_statement				//switch-case
 	| void_function_call			//void functions
+	| until_statement					//do_until
 	;
 
 compound_statement
@@ -676,6 +681,25 @@ conditional_exp
 		}
 	| literal
 	;
+	
+//Dodatni	zadatak
+until_statement	
+	:	_DO 
+	{
+		$<i>$ = ++du_num;
+		code("\n@do_until%d:", $<i>$);
+	} 
+		statement _UNTIL _LPAREN relation
+	{
+		code("\n\t\t%s\t@do_until%d", opp_jumps[$6], $<i>2);
+		code("\n\t\tJMP\t@do_until_end%d", $<i>2);
+	} 
+		_RPAREN _SEMI 
+	{
+		code("\n@do_until_end%d:", $<i>2);
+	} 
+	;	
+
 	
 %%
 

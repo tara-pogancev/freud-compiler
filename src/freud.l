@@ -25,6 +25,9 @@
 "default"					{ return _DEFAULT; }
 "finish"					{ return _FINISH; }
 
+"do"							{ return _DO; }
+"until"						{ return _UNTIL; }
+
 "("								{ return _LPAREN; }
 ")"								{ return _RPAREN; }
 "{"								{ return _LBRACKET; }
