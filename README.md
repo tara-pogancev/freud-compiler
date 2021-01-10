@@ -20,6 +20,7 @@ Neke od *funkcionalnosti kompajlera* podrazumevaju:
 	• Ternarni operator u okviru numeričkih izraza
 	• PARA iskaz (analogno logici for-statement-a)
 	• SWITCH - CASE
+	• DO - UNTIL
 
 ## Upotreba kompajlera
 
